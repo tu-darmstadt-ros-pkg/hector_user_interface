@@ -4,51 +4,57 @@ import Hector.Utils 1.0
 import Hector.Style 1.0
 
 ListView {
-  id: control
-  property int lastCount: 0
-  property var style
-  property bool disableMouseSelection: true
-  spacing: 0
-  currentIndex: -1
+    id: control
 
-  header: Button {
-    id: headerButton
-    height: Units.pt(24)
-    width: parent.width
+    property bool disableMouseSelection: true
+    property int lastCount: 0
+    property var style
 
-    MissionTask {
-      anchors.fill: parent
-      current: control.currentIndex == -1
-      style: control.style
-      task: ({name: "Start of Mission"})
+    currentIndex: -1
+    spacing: 0
+
+    delegate: StyledButton {
+        id: item
+
+        property bool isCurrent: ListView.isCurrentItem
+
+        flat: !ListView.isCurrentItem
+        height: Units.pt(24)
+        style: control.style
+        width: parent.width
+
+        onClicked: function () {
+            if (!disableMouseSelection) {
+                control.currentIndex = index;
+            }
+        }
+
+        MissionTask {
+            anchors.fill: parent
+            current: item.isCurrent
+            style: control.style
+            task: modelData
+        }
     }
-    background: Rectangle {
-      opacity: enabled ? 1.0 : 0.3
-      color: Style.handleMouseStates(headerButton, control.currentIndex == -1 ? control.style.primary.color : Style.background.content)
-    }
+    header: Button {
+        id: headerButton
+        height: Units.pt(24)
+        width: parent.width
 
-    onClicked: control.currentIndex = -1
-  }
+        background: Rectangle {
+            color: Style.handleMouseStates(headerButton, control.currentIndex == -1 ? control.style.primary.color : Style.background.content)
+            opacity: enabled ? 1.0 : 0.3
+        }
 
-  delegate: StyledButton {
-    id: item
-    property bool isCurrent: ListView.isCurrentItem
-    height: Units.pt(24)
-    width: parent.width
-    flat: !ListView.isCurrentItem
-    style: control.style
-    
-    MissionTask {
-      anchors.fill: parent
-      current: item.isCurrent
-      style: control.style
-      task: modelData
-    }
+        onClicked: control.currentIndex = -1
 
-    onClicked: function()  {
-      if(!disableMouseSelection) {
-        control.currentIndex = index
-      } 
+        MissionTask {
+            anchors.fill: parent
+            current: control.currentIndex == -1
+            style: control.style
+            task: ({
+                    "name": "Start of Mission"
+                })
+        }
     }
-  }
 }

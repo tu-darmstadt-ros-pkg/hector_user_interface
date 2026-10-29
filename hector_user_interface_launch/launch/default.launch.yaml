@@ -1,0 +1,50 @@
+launch:
+- arg:
+    name: robot_namespace
+    default: ""
+- arg:
+    name: rviz_config
+    default: "$(find-pkg-share hector_user_interface_launch)/rviz/default.rviz"
+- arg:
+    name: fullscreen
+    default: "false"
+
+- let:
+    name: fullscreen_param
+    value: "--fullscreen"
+    if: $(var fullscreen)
+- let:
+    name: fullscreen_param
+    value: ""
+    unless: $(var fullscreen)
+
+# When launched in a robot namespace, read tf from that namespace so rviz sees the
+# robot's unprefixed frames directly. With an empty namespace these are identity
+# remaps (relative tf already resolves to /tf), so the global default is unchanged.
+- set_remap:
+    from: "/tf"
+    to: "tf"
+- set_remap:
+    from: "/tf_static"
+    to: "tf_static"
+
+# start rviz
+- node:
+    pkg: "rviz2"
+    exec: "rviz2"
+    name: "$(anon hector_ui)"
+    args: "$(var fullscreen_param) -d $(var rviz_config) -s $(find-pkg-share hector_user_interface_launch)/media/splash.png"
+    output: "screen"
+    respawn: "true"
+    namespace: "$(var robot_namespace)"
+
+# start joy driver and gamepad satellite (operator station)
+- include:
+    file: "$(find-pkg-share hector_user_interface_launch)/launch/joy_satellite.launch.py"
+    arg:
+        - name: "robot_namespace"
+          value: "$(var robot_namespace)"
+
+# start connection manager
+- include:
+    file: "$(find-pkg-share connection_manager)/launch/connection_manager.launch.py"

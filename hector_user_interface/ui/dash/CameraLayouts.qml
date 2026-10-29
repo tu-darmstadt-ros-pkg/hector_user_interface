@@ -7,120 +7,122 @@ import Hector.Style 1.0
 import Hector.Utils 1.0
 
 Rectangle {
-  id: root
-  property bool locked: true
-  property var configuration
-  signal configurationUpdated
+    id: root
 
-  color: Style.background.container
-  
-  ColumnLayout {
-    anchors.fill: root
+    property var configuration
+    property bool locked: true
 
-    RowLayout  {
-      Layout.fillWidth: true
-      Text {
-        text: "Camera Layouts"
-        font: Style.fonts.subHeader
-        Layout.fillWidth: true
-      }
-      Button {
-        Layout.preferredWidth: Units.pt(32)
-        text: root.locked ? Style.icons.lockClosed : Style.icons.lockOpen
-        onClicked: root.locked = !root.locked
-      }
+    //! Emitted with the new layouts array. The parent owns storage; assigning `configuration`
+    //! here would break its binding to the active robot, so we never mutate it in place.
+    signal configurationUpdated(var layouts)
+
+    color: Style.background.container
+
+    ColumnLayout {
+        anchors.fill: root
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Text {
+                Layout.fillWidth: true
+                font: Style.fonts.subHeader
+                text: "Camera Layouts"
+            }
+            Button {
+                Layout.preferredWidth: Units.pt(32)
+                text: root.locked ? Style.icons.lockClosed : Style.icons.lockOpen
+
+                onClicked: root.locked = !root.locked
+            }
+        }
+        QtObject {
+            id: d
+            // Removes by index because modelData is a copy of the array entry, not the entry itself.
+            function removeLayout(index) {
+                root.configurationUpdated(root.configuration.filter(function (l, i) {
+                            return i !== index;
+                        }));
+            }
+        }
+        ListView {
+            id: cameraLayoutsListView
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            clip: true
+            model: configuration
+            spacing: Units.pt(2)
+
+            delegate: Rectangle {
+                color: Style.background.content
+                height: Units.pt(24)
+                width: root.width
+
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData.layout_name
+                }
+                MouseArea {
+                    acceptedButtons: Qt.LeftButton
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onClicked: {
+                        leftCameraView.transitionsEnabled = false;
+                        rightCameraView.transitionsEnabled = false;
+                        leftCameraView.selectCameraByName(modelData.left_cam);
+                        rightCameraView.selectCameraByName(modelData.right_cam);
+                        leftCameraView.transitionsEnabled = true;
+                        rightCameraView.transitionsEnabled = true;
+                    }
+                }
+                Button {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    flat: true
+                    height: parent.height
+                    visible: !locked
+                    width: height
+
+                    onClicked: d.removeLayout(index)
+
+                    Icon {
+                        anchors.fill: parent
+                        flat: true
+                        text: parent.hovered ? Style.icons.trashOpen : Style.icons.trash
+                    }
+                }
+            }
+            footer: RowLayout {
+                spacing: 0
+                visible: !locked
+                width: parent.width
+
+                TextField {
+                    id: layoutNameTextField
+                    Layout.fillWidth: true
+                    Layout.topMargin: cameraLayoutsListView.spacing
+                    hoverEnabled: true
+                    placeholderText: qsTr("Name")
+                }
+                StyledButton {
+                    Layout.preferredHeight: layoutNameTextField.height
+                    Layout.topMargin: cameraLayoutsListView.spacing
+                    style: Style.activeStyle
+                    text: qsTr("Add")
+
+                    onClicked: {
+                        if (!layoutNameTextField.text)
+                            return;
+                        var layout = {};
+                        layout.layout_name = layoutNameTextField.text;
+                        layout.left_cam = leftCameraView.selectedCamera ? leftCameraView.selectedCamera.configuration.id : "";
+                        layout.right_cam = rightCameraView.selectedCamera ? rightCameraView.selectedCamera.configuration.id : "";
+                        layoutNameTextField.clear();
+                        root.configurationUpdated((root.configuration || []).concat([layout]));
+                    }
+                }
+            }
+        }
     }
-    QtObject {
-      id: d
-      function removeLayout(layout) {
-        for (let i = 0; i < root.configuration.length; ++i) {
-          if (root.configuration[i].layout_name !== layout.layout_name) continue
-          root.configuration.splice(i, 1)
-          root.configuration = root.configuration // updates displayed list
-          root.configurationUpdated()
-          break
-        }
-      }
-    }
-
-    ListView {
-      id: cameraLayoutsListView
-      Layout.fillHeight: true
-      Layout.fillWidth: true
-      spacing: Units.pt(2)
-      clip: true
-      model: configuration
-
-      delegate: Rectangle {
-        color: Style.background.content
-        width: root.width 
-        height: Units.pt(24)
-        Text {
-          anchors.centerIn: parent
-          text: modelData.layout_name
-        }
-        MouseArea {
-          anchors.fill: parent
-          acceptedButtons: Qt.LeftButton
-          hoverEnabled: true
-          onClicked: {
-            leftCameraView.transitionsEnabled = false
-            rightCameraView.transitionsEnabled = false
-
-            leftCameraView.selectCameraByName(modelData.left_cam)
-            rightCameraView.selectCameraByName(modelData.right_cam)
-
-            leftCameraView.transitionsEnabled = true
-            rightCameraView.transitionsEnabled = true
-          }
-        }
-        Button {
-          height: parent.height
-          width: height
-          anchors.right: parent.right
-          anchors.verticalCenter: parent.verticalCenter
-          visible: !locked
-          flat: true
-          Icon {
-            anchors.fill: parent
-            flat: true
-            text: parent.hovered ? Style.icons.trashOpen : Style.icons.trash
-          }
-          onClicked: d.removeLayout(modelData)
-        }
-      }
-
-      footer: RowLayout {
-        width: parent.width
-        visible: !locked
-        spacing: 0
-        TextField {
-          id: layoutNameTextField
-          Layout.fillWidth: true
-          Layout.topMargin: cameraLayoutsListView.spacing
-          placeholderText: qsTr("Name")
-          hoverEnabled: true
-        }
-        StyledButton {
-          Layout.preferredHeight: layoutNameTextField.height
-          Layout.topMargin: cameraLayoutsListView.spacing
-          style: Style.activeStyle
-          text: qsTr("Add")
-          onClicked: {
-            if (!layoutNameTextField.text) return
-            if(!configuration) configuration = []
-            var layout = {}
-            layout.layout_name = layoutNameTextField.text
-            layout.left_cam = leftCameraView.selectedCamera ? leftCameraView.selectedCamera.name : ""
-            layout.right_cam = rightCameraView.selectedCamera ? rightCameraView.selectedCamera.name : ""
-            configuration.push(layout)
-            configuration = configuration
-            
-            layoutNameTextField.clear()
-            root.configurationUpdated()
-          }
-        }
-      }
-    }
-  }
 }

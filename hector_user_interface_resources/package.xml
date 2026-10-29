@@ -1,17 +1,22 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>hector_user_interface_resources</name>
-  <version>1.0.0</version>
+  <version>0.0.0</version>
   <description>The hector_user_interface_resources package</description>
 
   <maintainer email="fabian@sim.tu-darmstadt.de">Stefan Fabian</maintainer>
-
   <license>GPLv3</license>
-
   <author email="fabian@sim.tu-darmstadt.de">Stefan Fabian</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
   <exec_depend>qml-module-qtquick2</exec_depend>
   <exec_depend>qml-module-qtquick-controls2</exec_depend>
+  <exec_depend>qml_ros2_plugin</exec_depend>
   <exec_depend>hector_qml_controls</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

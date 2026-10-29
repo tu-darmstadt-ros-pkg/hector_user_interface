@@ -4,30 +4,29 @@ import Hector.Utils 1.0
 import Hector.Style 1.0
 
 RoundButton {
-  id: control
-  property var style: Style.base
-  property var buttonStyle: Style.buttonStyle(style)
+    id: control
 
-  hoverEnabled: true
-  font: Style.button.font
+    property var buttonStyle: Style.buttonStyle(style)
+    property var style: Style.base
 
-  contentItem: Text {
-    text: control.text
-    font: control.font
-    opacity: enabled ? 1 : 0.3
-    color: control.flat ? Style.handleMouseStates(control, control.checkable ? (control.checked ? control.buttonStyle.checkedColor : control.buttonStyle.uncheckedColor) : control.buttonStyle.color)
-                        : Style.getTextColor(control.background.color)
-    horizontalAlignment: Text.AlignHCenter
-    verticalAlignment: Text.AlignVCenter
-    elide: Text.ElideRight
-  }
+    font: Style.button.font
+    hoverEnabled: true
 
-  background: Rectangle {
-    implicitWidth: Units.pt(20)
-    implicitHeight: Units.pt(20)
-    radius: control.radius
-    visible: !control.flat
-    opacity: enabled ? 1 : 0.3
-    color: Style.handleMouseStates(control, control.checkable ? control.buttonStyle.uncheckedColor : control.buttonStyle.color, control.buttonStyle.checkedColor)
-  }
+    background: Rectangle {
+        color: Style.handleMouseStates(control, control.checkable ? control.buttonStyle.uncheckedColor : control.buttonStyle.color, control.buttonStyle.checkedColor)
+        implicitHeight: Units.pt(20)
+        implicitWidth: Units.pt(20)
+        opacity: enabled ? 1 : 0.3
+        radius: control.radius
+        visible: !control.flat
+    }
+    contentItem: Text {
+        color: control.flat ? Style.handleMouseStates(control, control.checkable ? (control.checked ? control.buttonStyle.checkedColor : control.buttonStyle.uncheckedColor) : control.buttonStyle.color) : Style.getTextColor(control.background.color)
+        elide: Text.ElideRight
+        font: control.font
+        horizontalAlignment: Text.AlignHCenter
+        opacity: enabled ? 1 : 0.3
+        text: control.text
+        verticalAlignment: Text.AlignVCenter
+    }
 }

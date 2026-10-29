@@ -1,0 +1,37 @@
+<library path="hector_user_interface">
+    <class name="hector_user_interface/WaypointTool"
+           type="hector_user_interface::WaypointTool"
+           base_class_type="rviz_common::Tool">
+        <description>
+            Tool to create waypoints for the Hector User Interface.
+        </description>
+    </class>
+    <class name="hector_user_interface/LookAtTool"
+           type="hector_user_interface::LookAtTool"
+           base_class_type="rviz_common::Tool">
+        <description>
+            Tool to define a look-at pose by placing an arrow on a surface.
+        </description>
+    </class>
+    <class name="hector_user_interface/LookAtObjectTool"
+           type="hector_user_interface::LookAtObjectTool"
+           base_class_type="rviz_common::Tool">
+        <description>
+            Tool to teach and reuse a configuration of look-at poses relative to an object.
+        </description>
+    </class>
+    <class name="hector_user_interface/NoteTool"
+           type="hector_user_interface::NoteTool"
+           base_class_type="rviz_common::Tool">
+        <description>
+            Tool to place notes in the 3D world.
+        </description>
+    </class>
+    <class name="hector_user_interface/UserInterface"
+           type="hector_user_interface::UserInterface"
+           base_class_type="rviz_common::Display">
+        <description>
+            Hector User Interface.
+        </description>
+    </class>
+</library>

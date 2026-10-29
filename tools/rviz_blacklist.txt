@@ -1,0 +1,49 @@
+# rviz blacklist. One rule per line, driving tools/rviz_normalize.py --check
+# (pre-commit hook) and --write (clean script). Grammar:
+#   [strip ]<selector>/<selector>/...
+#   - no prefix => reset the matched key's subtree to the committed (HEAD) value
+#     (keeps the key, drops local drift); 'strip ' => delete the matched nodes.
+#   - '/' descends; not split inside [...] or when escaped as \/.
+#   - selectors: literal key (or item by Name); '*' any child; '**' recursive
+#     descent (zero or more intermediate levels, so a rule matches at any nesting
+#     depth, e.g. a display inside a rviz_common/Group); '~REGEX' key/Name matches
+#     regex; '[Field~REGEX]' item/mapping whose child Field value matches (a base
+#     filter selecting a container).
+# Items (displays, panels) are paired with the repo by their Name, not position.
+
+# Window layout, dock state, sizes, and the giant QMainWindow State base64 blob
+Window Geometry
+
+# Per-panel tree UI state
+Panels/*/Tree Height
+Panels/*/Property Tree Widget/Expanded
+Panels/*/Property Tree Widget/Splitter Ratio
+Panels/*/Expanded
+Panels/*/Splitter Ratio
+
+# Session choices: Time panel sync source and the global fixed frame
+Panels/[Class~^rviz_common/Time$]/SyncSource
+Visualization Manager/Global Options/Fixed Frame
+
+# Whole camera view under Views (NOT Transformation/Current, the TF class). Reset
+# the entire Current subtree so a view-controller class flip (Orbit <-> Hector,
+# which restructures the child keys) cannot leave a corrupt mix.
+Visualization Manager/Views/Current
+
+# Auto-computed display data bounds and decay (regenerate from live data). '**'
+# reaches displays nested inside a rviz_common/Group, matching the strip rules below.
+Visualization Manager/Displays/**/Autocompute Value Bounds/Min Value
+Visualization Manager/Displays/**/Autocompute Value Bounds/Max Value
+Visualization Manager/Displays/**/Decay Time
+
+# Per-robot namespaces (dynamic, runtime-generated) under MultiRobotModel displays.
+# Base filter selects the display by Class; the key regex strips its '/'-prefixed
+# robot-namespace children (and their whole subtree) entirely. '**' reaches the
+# display whether top-level or nested inside a rviz_common/Group.
+strip Visualization Manager/Displays/**/[Class~^hector_rviz_plugins/MultiRobotModel$]/~^\/
+
+# Loaded-map session state under MapBag displays (the dynamic "N Maps" entry).
+# '**' reaches the display whether top-level or nested inside a rviz_common/Group.
+strip Visualization Manager/Displays/**/[Class~^map_bag_rviz_plugin/MapBag$]/~[0-9]+ Maps
+
+strip Visualization Manager/Displays/**/Namespaces

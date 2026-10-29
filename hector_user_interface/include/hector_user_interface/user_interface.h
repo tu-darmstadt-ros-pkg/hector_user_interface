@@ -5,7 +5,7 @@
 #ifndef HECTOR_USER_INTERFACE_USER_INTERFACE_H
 #define HECTOR_USER_INTERFACE_USER_INTERFACE_H
 
-#include <hector_rviz_overlay/displays/qml_overlay_display.h>
+#include <hector_rviz_overlay/displays/qml_overlay_display.hpp>
 
 namespace hector_user_interface
 {

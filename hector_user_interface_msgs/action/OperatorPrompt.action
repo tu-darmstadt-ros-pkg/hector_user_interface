@@ -1,0 +1,27 @@
+# Goal - robot software asks the operator a question and waits for the answer.
+string source               # Originating robot id/label shown on the card, e.g. "robot_a". Optional.
+uint8 SEVERITY_INFO=10
+uint8 SEVERITY_WARNING=20
+uint8 SEVERITY_ERROR=30
+uint8 severity 10           # Visual severity (icon/colour). Independent of obtrusiveness.
+bool modal false            # false: unobtrusive card. true: centered modal popup.
+bool dismissable false      # If true, the card can be dismissed. If false, the request must be answered, time out, or be robot-canceled.
+string title                # Short headline.
+string message              # Longer explanation shown to the operator.
+uint8 PRESET_CONFIRM=0      # Yes / No
+uint8 PRESET_PROCEED=1      # Proceed / Abort
+uint8 PRESET_ACKNOWLEDGE=2  # OK
+uint8 PRESET_CUSTOM=3       # Use `options` for button labels
+uint8 preset 0
+string[] options            # Custom button labels; used only when preset==PRESET_CUSTOM.
+float32 timeout 0.0         # Seconds until auto-resolve with OUTCOME_TIMED_OUT. <=0 disables.
+uint8[] compressed_image    # JPEG image
+---
+# Result
+uint8 OUTCOME_ANSWERED=0
+uint8 OUTCOME_TIMED_OUT=1
+uint8 OUTCOME_DISMISSED=2
+uint8 outcome
+string chosen_option        # Preset: stable id ("yes"/"no"/"proceed"/"abort"/"ok"). CUSTOM: the selected option string. Empty if not answered.
+---
+# Feedback (none)

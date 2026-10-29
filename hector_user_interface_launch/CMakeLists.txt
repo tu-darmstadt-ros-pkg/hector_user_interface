@@ -1,17 +1,26 @@
-cmake_minimum_required(VERSION 3.0.2)
-project(hector_user_interface_launch VERSION 1.0.0)
+cmake_minimum_required(VERSION 3.8)
+project(hector_user_interface_launch)
 
-find_package(catkin REQUIRED)
+# Find necessary packages
+find_package(ament_cmake REQUIRED)
 
-catkin_package()
+# Register environment hooks
+ament_environment_hooks(20.register_tuda_wss.dsv.in)
 
-#############
-## Install ##
-#############
+# Install directories
+install(DIRECTORY
+  launch
+  media
+  rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+# Install scripts separately with source permissions as source permissions
+# and symlink install conflict, so they would be copied instead of symlinked
+install(DIRECTORY
+  scripts
+  DESTINATION share/${PROJECT_NAME}
+  USE_SOURCE_PERMISSIONS # executable scripts stay executable after installation
+)
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY launch media rviz DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+# Mark the package as an ament package
+ament_package()

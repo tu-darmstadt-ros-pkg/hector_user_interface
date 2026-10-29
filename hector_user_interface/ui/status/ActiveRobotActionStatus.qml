@@ -1,222 +1,232 @@
 import QtQuick 2.3
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.1
+import Hector.Actions 1.0
 import Hector.Controls 1.0
 import Hector.InternalControls 1.0
+import Hector.MultiRobot 1.0
 import Hector.Style 1.0
 import Hector.Utils 1.0
 
 Rectangle {
-  id: root
-  implicitHeight: robotActionStatus.implicitHeight + robotActionDetails.implicitHeight
-  implicitWidth: robotActionStatus.implicitWidth
+    id: root
+    implicitHeight: robotActionStatus.implicitHeight + robotActionDetails.implicitHeight
+    implicitWidth: robotActionStatus.implicitWidth
 
-  QtObject {
-    id: d
-    property var activeExecutions: RobotActionExecutionManager.activeExecutions || []
+    QtObject {
+        id: d
 
-    property bool canceling: {
-      if (!d.activeExecutions) return false
-      return d.activeExecutions.every(x => !x.active || x.state == RobotActionExecution.ExecutionState.Canceling)
-    }
-
-    property int countExecutions: {
-      if (!d.activeExecutions) return 0
-      return d.activeExecutions.length
-    }
-
-    onCountExecutionsChanged: {
-      if (countExecutions > 1) return
-      robotActionDetails.showDetails = false
-    }
-
-    property int countDone: {
-      if (!activeExecutions) return 0
-      var count = 0
-      for (let execution of d.activeExecutions) {
-        if (execution.active === true) continue
-        count++
-      }
-      return count
-    }
-
-    property RobotActionExecution summaryExecution: RobotActionExecution {
-      action: RobotAction {
-        type: "composite"
-        name: {
-          if (d.countExecutions > 1) return d.countExecutions + " actions running"
-          return d.countExecutions === 1 ? d.activeExecutions[0].action.name : ""
+        property var actionManager: RobotManager.activeRobot.actionManager
+        property var activeExecutions: d.actionManager.activeExecutions || []
+        property bool canceling: {
+            if (!d.activeExecutions)
+                return false;
+            return d.activeExecutions.every(x => !x.active || x.state == RobotActionExecution.ExecutionState.Canceling);
         }
-        icon: {
-          if (d.activeExecutions && d.activeExecutions.length == 1 && d.activeExecutions[0].action.icon) return d.activeExecutions[0].action.icon
-          return Style.icons.robotAction
+        property int countDone: {
+            if (!activeExecutions)
+                return 0;
+            var count = 0;
+            for (let execution of d.activeExecutions) {
+                if (execution.active === true)
+                    continue;
+                count++;
+            }
+            return count;
         }
-      }
-
-      active: d.countExecutions !== d.countDone
-
-      progress: {
-        if (!d.activeExecutions) return false
-        if (d.countExecutions === 0) return 0
-        if (d.countExecutions === 1) return d.activeExecutions[0].progress
-        // Compute progress bounds of all active executions
-        let minProgress = d.countDone
-        let maxProgress = minProgress
-        for (let execution of d.activeExecutions) {
-          if (!execution.active) continue // Already counted by done
-          if (!execution.progress) {
-            maxProgress += 1
-            continue
-          }
-          if (execution.progress.length == 2) {
-            minProgress += execution.progress[0]
-            maxProgress += execution.progress[1]
-            continue
-          }
-          minProgress += execution.progress
-          maxProgress += execution.progress
+        property int countExecutions: {
+            if (!d.activeExecutions)
+                return 0;
+            return d.activeExecutions.length;
         }
-        return [minProgress / d.countExecutions, maxProgress / d.countExecutions]
-      }
+        property RobotActionExecution summaryExecution: RobotActionExecution {
+            active: d.countExecutions !== d.countDone
+            progress: {
+                if (!d.activeExecutions)
+                    return false;
+                if (d.countExecutions === 0)
+                    return 0;
+                if (d.countExecutions === 1)
+                    return d.activeExecutions[0].progress;
+                // Compute progress bounds of all active executions
+                let minProgress = d.countDone;
+                let maxProgress = minProgress;
+                for (let execution of d.activeExecutions) {
+                    if (!execution.active)
+                        // Already counted by done
+                        continue;
+                    if (!execution.progress) {
+                        maxProgress += 1;
+                        continue;
+                    }
+                    if (execution.progress.length == 2) {
+                        minProgress += execution.progress[0];
+                        maxProgress += execution.progress[1];
+                        continue;
+                    }
+                    minProgress += execution.progress;
+                    maxProgress += execution.progress;
+                }
+                return [minProgress / d.countExecutions, maxProgress / d.countExecutions];
+            }
+            state: {
+                // Keep the result state of the batch once its executions were removed for the slide out animation
+                if (d.activeExecutions.length === 0)
+                    return d.actionManager.batchResultState;
+                return ExecutionStates.summaryState(d.activeExecutions);
+            }
+            statusText: {
+                if (d.countExecutions === 0)
+                    return "";
+                if (d.countExecutions > 1)
+                    return d.countDone + " out of " + d.countExecutions + " completed";
+                let execution = d.activeExecutions[0];
+                return execution.statusText;
+            }
 
-      property int lastState: RobotActionExecution.ExecutionState.Succeeded
-      state: {
-        // Keep last state if no active executions for slide out animation
-        if (d.activeExecutions.length === 0) return lastState
-        // Check if any are running and if all finished if one failed
-        let state = RobotActionExecution.ExecutionState.Succeeded
-        for (let execution of d.activeExecutions) {
-          if (execution.state === RobotActionExecution.ExecutionState.Running) {
-            return execution.state
-          }
-          if (execution.state === RobotActionExecution.ExecutionState.Failed) {
-            state = execution.state
-          } else if (state === RobotActionExecution.ExecutionState.Succeeded &&
-                     execution.state === RobotActionExecution.ExecutionState.Canceled) {
-            state = execution.state
-          }
+            action: RobotAction {
+                icon: {
+                    if (d.activeExecutions && d.activeExecutions.length == 1 && d.activeExecutions[0].action.icon)
+                        return d.activeExecutions[0].action.icon;
+                    return Style.icons.robotAction;
+                }
+                name: {
+                    if (d.countExecutions > 1)
+                        return d.countExecutions + " actions running";
+                    return d.countExecutions === 1 ? d.activeExecutions[0].action.name : "";
+                }
+                type: "composite"
+            }
         }
-        return state
-      }
 
-      statusText: {
-        if (d.countExecutions === 0) return ""
-        if (d.countExecutions > 1) return d.countDone + " out of " + d.countExecutions + " completed"
-        let execution = d.activeExecutions[0]
-        return execution.statusText
-      }
+        onCountExecutionsChanged: {
+            if (countExecutions > 1)
+                return;
+            robotActionDetails.showDetails = false;
+        }
     }
-  }
-
-  Rectangle {
-    id: robotActionStatus
-    width: parent.width
-    clip: true
-    implicitHeight: summaryLayout.implicitHeight
-    implicitWidth: summaryLayout.implicitWidth
-
-    RowLayout {
-      id: summaryLayout
-      width: parent.width
-      RobotActionExecutionStatus {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        id: actionSummary
-        execution: d.activeExecutions.length == 1 ? d.activeExecutions[0] : d.summaryExecution
+    Rectangle {
+        id: robotActionStatus
+        clip: true
+        implicitHeight: summaryLayout.implicitHeight
+        implicitWidth: summaryLayout.implicitWidth
         width: parent.width
 
-        MouseArea {
-          id: mouseArea
-          anchors.fill: parent
-          hoverEnabled: true
-          onClicked: {
-            if (d.activeExecutions.length <= 1) return
-            robotActionDetails.showDetails = !robotActionDetails.showDetails
-          }
+        RowLayout {
+            id: summaryLayout
+            width: parent.width
+
+            RobotActionExecutionStatus {
+                id: actionSummary
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                execution: d.activeExecutions.length == 1 ? d.activeExecutions[0] : d.summaryExecution
+                width: parent.width
+
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onClicked: {
+                        if (d.activeExecutions.length <= 1)
+                            return;
+                        robotActionDetails.showDetails = !robotActionDetails.showDetails;
+                    }
+                }
+            }
+            // Cancel all
+            StyledButton {
+                id: cancelAllButton
+                Layout.fillHeight: true
+                style: Style.teleoperation
+                visible: d.summaryExecution.active
+
+                onClicked: {
+                    for (let execution of d.activeExecutions) {
+                        d.actionManager.cancel(execution.action);
+                    }
+                }
+                onPressAndHold: {
+                    for (let execution of d.activeExecutions) {
+                        d.actionManager.cancel(execution.action, true);
+                    }
+                }
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 0
+
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        color: Style.getTextColor(cancelAllButton.style.primary.color)
+                        text: Style.icons.cancel
+                        visible: !d.canceling
+
+                        font {
+                            family: Style.iconFontFamily
+                            pointSize: 24
+                        }
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        color: Style.getTextColor(cancelAllButton.style.primary.color)
+                        font.pointSize: 9
+                        font.weight: Font.Bold
+                        text: d.countExecutions > 1 ? "Cancel All" : "Cancel"
+                        visible: !d.canceling
+                    }
+                }
+                Text {
+                    anchors.fill: parent
+                    color: Style.getTextColor(cancelAllButton.style.primary.color)
+                    font.pointSize: 11
+                    font.weight: Font.Bold
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Hold to force cancel"
+                    verticalAlignment: Text.AlignVCenter
+                    visible: d.canceling
+                    wrapMode: Text.WordWrap
+                }
+            }
         }
-      }
-      // Cancel all
-      StyledButton {
-        id: cancelAllButton
-        Layout.fillHeight: true
-        style: Style.teleoperation
-        visible: d.summaryExecution.active
-        ColumnLayout {
-          anchors.centerIn: parent
-          spacing: 0
-          Text {
-            visible: !d.canceling
-            Layout.alignment: Qt.AlignHCenter
-            color: Style.getTextColor(cancelAllButton.style.primary.color)
-            text: Style.icons.cancel
-            font { family: Style.iconFontFamily; pointSize: 24 }
-          }
-          Text {
-            visible: !d.canceling
-            Layout.alignment: Qt.AlignHCenter
-            color: Style.getTextColor(cancelAllButton.style.primary.color)
-            text: d.countExecutions > 1 ? "Cancel All" : "Cancel"
-            font.pointSize: 9
-            font.weight: Font.Bold
-          }
+        Text {
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: Units.pt(2)
+            anchors.right: parent.right
+            anchors.rightMargin: Units.pt(8) + cancelAllButton.width
+            color: Style.getTextColor(Style.background.content)
+            font: Style.fonts.tiny
+            text: robotActionDetails.showDetails ? "Hide" : "Show Details"
+            visible: d.activeExecutions.length > 1
         }
-          Text {
-            visible: d.canceling
+    }
+    Rectangle {
+        id: robotActionDetails
+
+        property bool showDetails: false
+
+        anchors.top: robotActionStatus.bottom
+        color: Style.background.content
+        height: showDetails ? Math.min(d.activeExecutions.length * Units.pt(36), Units.pt(320)) : 0
+        width: parent.width
+
+        Behavior on height  {
+            NumberAnimation {
+            }
+        }
+
+        ListView {
+            id: robotActionListView
             anchors.fill: parent
-            color: Style.getTextColor(cancelAllButton.style.primary.color)
-            text: "Hold to force cancel"
-            font.pointSize: 11
-            font.weight: Font.Bold
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.WordWrap
-          }
+            clip: true
+            model: d.activeExecutions
 
-        onClicked: {
-          for (let execution of d.activeExecutions) {
-            RobotActionExecutionManager.cancel(execution.action)
-          }
+            delegate: RobotActionExecutionStatus {
+                execution: modelData
+                height: Units.pt(36)
+                width: root.width
+            }
         }
-
-        onPressAndHold: {
-          for (let execution of d.activeExecutions) {
-            RobotActionExecutionManager.cancel(execution.action, true)
-          }
-        }
-      }
     }
-
-    Text {
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      anchors.rightMargin: Units.pt(8) + cancelAllButton.width
-      anchors.bottomMargin: Units.pt(2)
-      color: Style.getTextColor(Style.background.content)
-      font: Style.fonts.tiny
-      text: robotActionDetails.showDetails ? "Hide" : "Show Details"
-      visible: d.activeExecutions.length > 1
-    }
-  }
-
-  Rectangle {
-    id: robotActionDetails
-    anchors.top: robotActionStatus.bottom
-    width: parent.width
-    property bool showDetails: false
-    height: showDetails ? Math.min(d.activeExecutions.length * Units.pt(36), Units.pt(320)) : 0
-    Behavior on height { NumberAnimation {} }
-    color: Style.background.content
-    ListView {
-      id: robotActionListView
-      anchors.fill: parent
-      clip: true
-
-      model: d.activeExecutions
-      delegate: RobotActionExecutionStatus {
-        height: Units.pt(36)
-        width: root.width
-        execution: modelData
-      }
-    }
-  }
 }

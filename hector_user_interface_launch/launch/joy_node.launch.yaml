@@ -1,0 +1,23 @@
+# game_controller_node, not joy_node: it drives SDL's GameController API, which maps every pad in
+# SDL's controller database onto the one canonical layout hector_gamepad_manager expects. joy_node
+# publishes raw device indices, where the same id means different controls on different pads.
+#
+# A pad missing from SDL's database is not opened at all (check with `ros2 run joy
+# joy_enumerate_devices`); supply a mapping via SDL_GAMECONTROLLERCONFIG if that happens.
+launch:
+- arg:
+    name: device_name
+    default: ""
+
+- node:
+    pkg: "joy"
+    exec: "game_controller_node"
+    name: "joy_node"
+    output: "screen"
+    param:
+    - name: "device_name"
+      value: "$(var device_name)"
+    - name: "deadzone"
+      value: 0.1
+    - name: "autorepeat_rate"
+      value: 30.0

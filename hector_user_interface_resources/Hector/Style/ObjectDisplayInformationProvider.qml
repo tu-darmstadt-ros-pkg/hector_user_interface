@@ -3,16 +3,21 @@ import QtQuick.Controls 2.1
 import Hector.Utils 1.0
 
 Object {
-  id: root
-  property color color: "black"
-  property QtObject iconProvider: ObjectIconProvider { color: root.color }
+    id: root
 
-
-  function lookup(type) {
-    var name = type
-    if (type == "manometer") {
-      name = "Manometer"
+    property color color: "black"
+    property QtObject iconProvider: ObjectIconProvider {
+        color: root.color
     }
-    return {name: name, icon: iconProvider.lookup(type)}
-  }
+
+    function lookup(type) {
+        var name = type;
+        if (type == "manometer") {
+            name = "Manometer";
+        }
+        return {
+            "name": name,
+            "icon": iconProvider.lookup(type)
+        };
+    }
 }

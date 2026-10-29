@@ -4,29 +4,28 @@ import Hector.Utils 1.0
 import Hector.Style 1.0
 
 TabButton {
-  id: control
-  property var style: Style.base
-  property var buttonStyle: Style.buttonStyle(style)
+    id: control
 
-  font: Style.button.font
-  hoverEnabled: true
+    property var buttonStyle: Style.buttonStyle(style)
+    property var style: Style.base
 
-  contentItem: Text {
-    text: control.text
-    font: control.font
-    opacity: enabled ? 1 : 0.3
-    color: control.flat ? (control.checkable ? (control.checked ? control.buttonStyle.checkedColor : control.buttonStyle.uncheckedColor) : control.buttonStyle.color)
-                        : (control.checked ? Style.getTextColor(Style.background.content) : Style.getTextColor(control.background.color))
-    horizontalAlignment: Text.AlignHCenter
-    verticalAlignment: Text.AlignVCenter
-    elide: Text.ElideRight
-  }
+    font: Style.button.font
+    hoverEnabled: true
 
-  background: Rectangle {
-    implicitWidth: Units.pt(50)
-    implicitHeight: Style.button.defaultHeight
-    visible: !control.flat && !control.checked
-    opacity: enabled ? 1 : 0.3
-    color: Style.handleMouseStates(control, control.buttonStyle.color, Style.background.content)
-  }
+    background: Rectangle {
+        color: Style.handleMouseStates(control, control.buttonStyle.color, Style.background.content)
+        implicitHeight: Style.button.defaultHeight
+        implicitWidth: Units.pt(50)
+        opacity: enabled ? 1 : 0.3
+        visible: !control.flat && !control.checked
+    }
+    contentItem: Text {
+        color: control.flat ? (control.checkable ? (control.checked ? control.buttonStyle.checkedColor : control.buttonStyle.uncheckedColor) : control.buttonStyle.color) : (control.checked ? Style.getTextColor(Style.background.content) : Style.getTextColor(control.background.color))
+        elide: Text.ElideRight
+        font: control.font
+        horizontalAlignment: Text.AlignHCenter
+        opacity: enabled ? 1 : 0.3
+        text: control.text
+        verticalAlignment: Text.AlignVCenter
+    }
 }

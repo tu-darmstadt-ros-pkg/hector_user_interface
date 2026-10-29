@@ -4,120 +4,135 @@ import QtQuick.Layouts 1.1
 import Hector.Controls 1.0
 import Hector.Style 1.0
 import Hector.Utils 1.0
-import Ros 1.0
+import Ros2 1.0
+import Hector.MultiRobot 1.0
 
 Item {
-  id: root
-  implicitWidth: Math.max(estopDetails.implicitWidth, estopStatus.implicitWidth)
-  implicitHeight: estopDetails.implicitHeight + estopStatus.implicitHeight
-  onVisibleChanged: {
-    if (!visible) estopDetails.showDetails = false
-  }
+    id: root
 
-  property var estopStates: {
-    if (!estopSubscriber.message) return []
-    var result = []
-    for (var i = 0; i < estopSubscriber.message.names.length; ++i) {
-      result.push({name: estopSubscriber.message.names.at(i), value: estopSubscriber.message.values.at(i)})
+    property int activeEstopCount: {
+        if (!estopStates)
+            return 0;
+        var count = 0;
+        for (let estop of estopStates) {
+            if (estop.value)
+                ++count;
+        }
+        return count;
     }
-    return result
-  }
-  property int activeEstopCount: {
-    if (!estopStates) return 0
-    var count = 0
-    for (let estop of estopStates) {
-      if (estop.value) ++count
+    property var estopStates: {
+        if (!estopSubscriber.message)
+            return [];
+        var result = [];
+        for (var i = 0; i < estopSubscriber.message.names.length; ++i) {
+            result.push({
+                    "name": estopSubscriber.message.names.at(i),
+                    "value": estopSubscriber.message.values.at(i)
+                });
+        }
+        return result;
     }
-    return count
-  }
 
-  Subscriber {
-    id: estopSubscriber
-    topic: "/e_stop_manager/e_stop_list"
-  }
+    implicitHeight: estopDetails.implicitHeight + estopStatus.implicitHeight
+    implicitWidth: Math.max(estopDetails.implicitWidth, estopStatus.implicitWidth)
 
-  Rectangle {
-    id: estopStatus
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
-    implicitHeight: eStopLayout.implicitHeight
-    implicitWidth: eStopLayout.implicitWidth
-    color: Style.emergencyStop.checkedColor
+    onVisibleChanged: {
+        if (!visible)
+            estopDetails.showDetails = false;
+    }
 
-    RowLayout {
-      id: eStopLayout
-      anchors.fill: parent
-      Icon {
-        Layout.preferredWidth: Units.pt(36)
-        Layout.preferredHeight: Units.pt(36)
-        Layout.margins: Units.pt(8)
-        backgroundColor: Style.getTextColor(Style.emergencyStop.checkedColor)
+    Subscription {
+        id: estopSubscriber
+        topic: RobotManager.activeRobot.namespace + "/e_stop_manager/e_stop_list"
+        qos: Ros2.QoS().transient_local().reliable().keep_last(1)
+    }
+    Rectangle {
+        id: estopStatus
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         color: Style.emergencyStop.checkedColor
-        text: Style.icons.stop
-      }
+        implicitHeight: eStopLayout.implicitHeight
+        implicitWidth: eStopLayout.implicitWidth
 
-      ColumnLayout {
-        Layout.fillWidth: true
-        Layout.alignment: Qt.AlignVCenter
-        Layout.rightMargin: Units.pt(12)
+        RowLayout {
+            id: eStopLayout
+            anchors.fill: parent
+
+            Icon {
+                Layout.margins: Units.pt(8)
+                Layout.preferredHeight: Units.pt(36)
+                Layout.preferredWidth: Units.pt(36)
+                backgroundColor: Style.getTextColor(Style.emergencyStop.checkedColor)
+                color: Style.emergencyStop.checkedColor
+                text: Style.icons.stop
+            }
+            ColumnLayout {
+                Layout.alignment: Qt.AlignVCenter
+                Layout.fillWidth: true
+                Layout.rightMargin: Units.pt(12)
+
+                Text {
+                    Layout.fillWidth: true
+                    color: Style.getTextColor(Style.emergencyStop.checkedColor)
+                    font: Style.fonts.header
+                    text: "Stopped!"
+                }
+                Text {
+                    Layout.fillWidth: true
+                    color: Style.getTextColor(Style.emergencyStop.checkedColor)
+                    font: Style.fonts.subHeader
+                    text: activeEstopCount + " E-Stop" + (activeEstopCount == 1 ? "" : "s") + " active"
+                }
+            }
+        }
         Text {
-          Layout.fillWidth: true
-          font: Style.fonts.header
-          text: "Stopped!"
-          color: Style.getTextColor(Style.emergencyStop.checkedColor)
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: Units.pt(4)
+            anchors.right: parent.right
+            anchors.rightMargin: Units.pt(8)
+            color: Style.getTextColor(Style.emergencyStop.checkedColor)
+            font: Style.fonts.tiny
+            text: estopDetails.showDetails ? "Hide" : "Show Details"
+        }
+        MouseArea {
+            anchors.fill: parent
+
+            onClicked: estopDetails.showDetails = !estopDetails.showDetails
+        }
+    }
+    Rectangle {
+        id: estopDetails
+
+        property var showDetails: false
+
+        anchors.bottom: estopStatus.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: Style.background.content
+        height: showDetails ? Math.min(root.estopStates.length * Units.pt(24) + Units.pt(16), Units.pt(320)) : 0
+
+        Behavior on height  {
+            NumberAnimation {
+            }
         }
 
-        Text {
-          Layout.fillWidth: true
-          font: Style.fonts.subHeader
-          text: activeEstopCount + " E-Stop" + (activeEstopCount == 1 ? "" : "s") + " active"
-          color: Style.getTextColor(Style.emergencyStop.checkedColor)
+        ListView {
+            id: estopListView
+            anchors.fill: parent
+            anchors.leftMargin: Units.pt(8)
+            anchors.rightMargin: Units.pt(8)
+            bottomMargin: Units.pt(8)
+            clip: true
+            model: root.estopStates
+            topMargin: Units.pt(8)
+
+            delegate: EStopStatusItem {
+                height: Units.pt(24)
+                name: modelData.name
+                value: modelData.value
+                width: parent.width
+            }
         }
-      }
     }
-
-    Text {
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      anchors.rightMargin: Units.pt(8)
-      anchors.bottomMargin: Units.pt(4)
-      color: Style.getTextColor(Style.emergencyStop.checkedColor)
-      font: Style.fonts.tiny
-      text: estopDetails.showDetails ? "Hide" : "Show Details"
-    }
-
-    MouseArea {
-      anchors.fill: parent
-      onClicked: estopDetails.showDetails = !estopDetails.showDetails
-    }
-  }
-
-  Rectangle {
-    id: estopDetails
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: estopStatus.top
-    property var showDetails: false
-    height: showDetails ? Math.min(root.estopStates.length * Units.pt(24) + Units.pt(16), Units.pt(320)) : 0
-    Behavior on height { NumberAnimation {} }
-    color: Style.background.content
-    ListView {
-      id: estopListView
-      anchors.fill: parent
-      anchors.leftMargin: Units.pt(8)
-      anchors.rightMargin: Units.pt(8)
-      topMargin: Units.pt(8)
-      bottomMargin: Units.pt(8)
-      clip: true
-
-      model: root.estopStates
-      delegate: EStopStatusItem {
-        height: Units.pt(24)
-        width: parent.width
-        name: modelData.name
-        value: modelData.value
-      }
-    }
-  }
 }

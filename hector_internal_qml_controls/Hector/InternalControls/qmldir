@@ -3,8 +3,8 @@ MissionListView 1.0 MissionListView.qml
 MissionTask 1.0 MissionTask.qml
 ObjectProvider 1.0 ObjectProvider.qml
 ObjectPopup 1.0 ObjectPopup.qml
-singleton OperationModeManager 1.0 OperationModeManager.qml
 SelectIconDialog 1.0 SelectIconDialog.qml
 StyledButton 1.0 StyledButton.qml
 StyledRoundButton 1.0 StyledRoundButton.qml
 StyledTabButton 1.0 StyledTabButton.qml
+VisibilityModeSelector 1.0 VisibilityModeSelector.qml

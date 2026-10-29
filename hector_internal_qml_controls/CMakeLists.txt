@@ -1,17 +1,14 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.5)
 project(hector_internal_qml_controls VERSION 1.0.0)
 
-find_package(catkin REQUIRED)
+find_package(ament_cmake REQUIRED)
 
-catkin_package()
-
-catkin_add_env_hooks(export_hector_internal_qml_controls SHELLS sh)
+ament_environment_hooks(register_hector_internal_qml_controls.dsv.in)
 
 #############
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+install(DIRECTORY Hector DESTINATION share/${PROJECT_NAME})
 
-install(DIRECTORY Hector DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+ament_package()
