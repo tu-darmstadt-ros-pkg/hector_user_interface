@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick
 import "NoteColors.js" as NoteColors
 
 // Displays all notes of the NoteTool as clickable icons anchored to their 3D point and hosts

@@ -1,14 +1,14 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.2
+import QtQuick
+import QtQuick.Controls.Basic
 import QtQuick.Templates as T
-import QtQuick.Layouts 1.1
-import Hector.InternalControls 1.0
-import Hector.InternalControls.RobotAction 1.0
-import Hector.Controls 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
-import Hector.MultiRobot 1.0
-import Ros2 1.0
+import QtQuick.Layouts
+import Hector.InternalControls
+import Hector.InternalControls.RobotAction
+import Hector.Controls
+import Hector.Style
+import Hector.Utils
+import Hector.MultiRobot
+import Ros2
 
 Item {
     id: root

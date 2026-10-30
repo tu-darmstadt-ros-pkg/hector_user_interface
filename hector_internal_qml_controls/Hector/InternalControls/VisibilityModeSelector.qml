@@ -1,8 +1,8 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.2
-import Hector.Controls 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Hector.Controls
+import Hector.Style
+import Hector.Utils
 
 //! Segmented three-state control for a visualization's visibility mode.
 //! Does not write mode itself, the owner updates it in response to modeSelected.

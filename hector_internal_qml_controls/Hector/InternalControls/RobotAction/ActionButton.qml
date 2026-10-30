@@ -1,10 +1,10 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.1
-import Hector.InternalControls 1.0
-import Hector.MultiRobot 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
-import Ros2 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Hector.InternalControls
+import Hector.MultiRobot
+import Hector.Style
+import Hector.Utils
+import Ros2
 
 StyledButton {
     id: control

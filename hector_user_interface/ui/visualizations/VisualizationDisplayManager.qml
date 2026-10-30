@@ -1,7 +1,7 @@
-import QtQml 2.3
-import QtQuick 2.3
-import Hector.MultiRobot 1.0
-import Hector.Utils 1.0
+import QtQml
+import QtQuick
+import Hector.MultiRobot
+import Hector.Utils
 
 //! Creates the announced visualization displays for all discovered robots.
 //! Instances are managed by robot_id and reused across RobotManager.robots

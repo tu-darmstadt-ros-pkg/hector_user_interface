@@ -1,8 +1,8 @@
-import QtQuick 2.3
-import QtQuick.Layouts 1.3
-import QtQuick.Controls.Basic 2.1
-import Hector.InternalControls 1.0
-import Hector.MultiRobot 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls.Basic
+import Hector.InternalControls
+import Hector.MultiRobot
 
 Item {
     id: root

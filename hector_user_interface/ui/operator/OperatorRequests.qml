@@ -1,8 +1,8 @@
-import QtQuick 2.8
-import QtQuick.Controls.Basic 2.2
-import Ros2 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Ros2
+import Hector.Style
+import Hector.Utils
 
 // Hosts the OperatorPrompt action server, keeps the pending requests, and renders
 // them as a bottom-right stack (non-modal) and a centered modal popup (modal).

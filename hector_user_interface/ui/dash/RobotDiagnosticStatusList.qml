@@ -1,12 +1,12 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.1
-import QtQuick.Layouts 1.1
-import Ros2 1.0
-import Hector.Controls 1.0
-import Hector.InternalControls 1.0
-import Hector.Utils 1.0
-import Hector.Style 1.0
-import Hector.MultiRobot 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import Ros2
+import Hector.Controls
+import Hector.InternalControls
+import Hector.Utils
+import Hector.Style
+import Hector.MultiRobot
 
 Dialog {
     id: root

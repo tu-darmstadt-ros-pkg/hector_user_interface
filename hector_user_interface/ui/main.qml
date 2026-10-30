@@ -1,9 +1,9 @@
-import QtQuick 2.8
-import QtQuick.Controls.Basic 2.2
-import Ros2 1.0
-import Hector.Controls 1.0
-import Hector.Utils 1.0
-import Hector.MultiRobot 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Ros2
+import Hector.Controls
+import Hector.Utils
+import Hector.MultiRobot
 
 Item {
     id: appWindow

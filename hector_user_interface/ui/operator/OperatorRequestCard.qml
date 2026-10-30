@@ -1,10 +1,10 @@
-import QtQuick 2.8
-import QtQuick.Controls.Basic 2.2
-import QtQuick.Layouts 1.1
-import Hector.Controls 1.0
-import Hector.InternalControls 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import Hector.Controls
+import Hector.InternalControls
+import Hector.Style
+import Hector.Utils
 
 // Presentational operator-prompt card. Used both as the bottom-right stack delegate
 // and as the centered modal card. Carries no request state of its own; the parent

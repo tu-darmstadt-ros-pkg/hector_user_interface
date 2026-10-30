@@ -1,14 +1,14 @@
-import QtQuick 2.8
-import QtQuick.Controls.Basic 2.2
-import QtQuick.Layouts 1.1
-import Ros2 1.0
-import Hector.Actions 1.0
-import Hector.Controls 1.0
-import Hector.Icons 1.0
-import Hector.InternalControls 1.0
-import Hector.MultiRobot 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import Ros2
+import Hector.Actions
+import Hector.Controls
+import Hector.Icons
+import Hector.InternalControls
+import Hector.MultiRobot
+import Hector.Style
+import Hector.Utils
 import "robots"
 import "sensors"
 import "status"

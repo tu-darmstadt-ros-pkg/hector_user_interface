@@ -1,6 +1,6 @@
-import QtQuick 2.3
-import Hector.MultiRobot 1.0
-import Hector.Utils 1.0
+import QtQuick
+import Hector.MultiRobot
+import Hector.Utils
 
 //! Dims the robot models discovered by the MultiRobotModel rviz display so that only the active
 //! robot is drawn at full opacity. Does nothing if no MultiRobotModel display is configured.

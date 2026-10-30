@@ -1,6 +1,6 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.1
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Hector.Utils
 
 NonVisualItem {
     id: root

@@ -1,8 +1,8 @@
 pragma Singleton
-import QtQuick 2.0
-import QtQuick.Controls.Material 2.2
-import Hector.Icons 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Material
+import Hector.Icons
+import Hector.Utils
 
 NonVisualItem {
     id: root

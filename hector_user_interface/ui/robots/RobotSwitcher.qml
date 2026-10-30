@@ -1,10 +1,10 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.2
-import QtQuick.Layouts 1.1
-import Hector.Icons 1.0
-import Hector.MultiRobot 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import Hector.Icons
+import Hector.MultiRobot
+import Hector.Style
+import Hector.Utils
 
 // Left-side multi-robot panel: a header with the robot count above a scrollable list of tiles for
 // all discovered robots, pinned ones first. Clicking a tile switches the active robot, its star

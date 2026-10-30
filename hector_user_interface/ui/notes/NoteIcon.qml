@@ -1,6 +1,6 @@
-import QtQuick 2.3
-import Hector.Controls 1.0
-import Hector.Style 1.0
+import QtQuick
+import Hector.Controls
+import Hector.Style
 
 // Round note icon; set backgroundColor to the note color.
 Icon {

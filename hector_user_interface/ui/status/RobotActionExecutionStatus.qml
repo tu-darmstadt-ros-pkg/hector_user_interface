@@ -1,10 +1,10 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.2
-import QtQuick.Layouts 1.1
-import Hector.Actions 1.0
-import Hector.Controls 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import Hector.Actions
+import Hector.Controls
+import Hector.Style
+import Hector.Utils
 
 Rectangle {
     id: root

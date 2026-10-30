@@ -1,5 +1,5 @@
-import QtQuick 2.3
-import Ros2 1.0
+import QtQuick
+import Ros2
 
 QtObject {
     property var __cache: []

@@ -1,9 +1,9 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.3
+import QtQuick
+import QtQuick.Controls.Basic
 import QtQuick.Templates as T
-import QtQuick.Layouts 1.1
-import Hector.Utils 1.0
-import Hector.Style 1.0
+import QtQuick.Layouts
+import Hector.Utils
+import Hector.Style
 import "NoteColors.js" as NoteColors
 
 // Non-modal create/edit/delete dialog for one note, popping out beside an anchor item on the

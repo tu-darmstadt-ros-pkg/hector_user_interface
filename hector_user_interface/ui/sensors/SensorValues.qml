@@ -1,8 +1,8 @@
-import QtQuick 2.3
-import QtQuick.Layouts 1.1
-import Hector.Controls 1.0
-import Hector.MultiRobot 1.0
-import Hector.Style 1.0
+import QtQuick
+import QtQuick.Layouts
+import Hector.Controls
+import Hector.MultiRobot
+import Hector.Style
 
 //! Displays the active robot's announced sensor values, one SensorValue per entry in
 //! RobotManager.activeRobot.sensors. The list and every subscription rebuild when the

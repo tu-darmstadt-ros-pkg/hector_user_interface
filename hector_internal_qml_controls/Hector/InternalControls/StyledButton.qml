@@ -1,7 +1,7 @@
-import QtQuick 2.6
-import QtQuick.Controls.Basic 2.2
-import Hector.Utils 1.0
-import Hector.Style 1.0
+import QtQuick
+import QtQuick.Controls.Basic
+import Hector.Utils
+import Hector.Style
 
 Button {
     id: control

@@ -1,9 +1,9 @@
-import QtQuick 2.3
-import QtQuick.Controls.Basic 2.3
+import QtQuick
+import QtQuick.Controls.Basic
 import QtQuick.Templates as T
-import Hector.InternalControls 1.0
-import Hector.Style 1.0
-import Hector.Utils 1.0
+import Hector.InternalControls
+import Hector.Style
+import Hector.Utils
 
 // Button showing the number of notes; opens the note overview below itself.
 StyledRoundButton {
