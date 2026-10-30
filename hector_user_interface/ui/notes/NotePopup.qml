@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.3
+import QtQuick.Controls.Basic 2.3
+import QtQuick.Templates as T
 import QtQuick.Layouts 1.1
 import Hector.Utils 1.0
 import Hector.Style 1.0
@@ -37,7 +38,7 @@ Dialog {
         root.selectedColor = note.color || NoteColors.defaultColor;
         textArea.text = note.text || "";
         root.parent = anchor;
-        var bounds = root.Overlay.overlay;
+        var bounds = root.T.Overlay.overlay;
         root.onLeft = !!bounds && anchor.mapToItem(bounds, anchor.width + gap + width, 0).x > bounds.width;
         open();
     }

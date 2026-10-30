@@ -7,7 +7,7 @@ import "VisualizationTypes.js" as VisualizationTypes
 //! Owns one rviz display group named after the robot and one display per
 //! supported announced visualization. Display visibility follows the robot's
 //! visualizationModes and the active robot.
-Object {
+NonVisualItem {
     id: root
 
     property Robot robot

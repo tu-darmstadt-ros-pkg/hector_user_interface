@@ -1,5 +1,5 @@
 import QtQuick 2.8
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import Ros2 1.0
 import Hector.Style 1.0
 import Hector.Utils 1.0
@@ -244,7 +244,7 @@ Item {
             acceptedButtons: Qt.AllButtons
             anchors.fill: parent
 
-            onWheel: wheel.accepted = true
+            onWheel: function (wheel) { wheel.accepted = true }
         }
     }
     OperatorRequestCard {

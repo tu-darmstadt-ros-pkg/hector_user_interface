@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.Controls 1.0
 import Hector.InternalControls 1.0
@@ -206,7 +206,7 @@ Rectangle {
             model: parameter.enumOptions
             textRole: "name"
 
-            onActivated: parameter.value = parameter.enumOptions[index].value
+            onActivated: function (index) { parameter.value = parameter.enumOptions[index].value }
         }
     }
     Component {

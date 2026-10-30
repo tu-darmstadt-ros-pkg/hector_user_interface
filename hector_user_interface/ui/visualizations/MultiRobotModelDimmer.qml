@@ -4,7 +4,7 @@ import Hector.Utils 1.0
 
 //! Dims the robot models discovered by the MultiRobotModel rviz display so that only the active
 //! robot is drawn at full opacity. Does nothing if no MultiRobotModel display is configured.
-Object {
+NonVisualItem {
     id: root
 
     property real activeAlpha: 1.0

@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.3
+import QtQuick.Controls.Basic 2.3
+import QtQuick.Templates as T
 import Hector.InternalControls 1.0
 import Hector.Style 1.0
 import Hector.Utils 1.0
@@ -44,7 +45,7 @@ StyledRoundButton {
         // Shrinks to the space below the button, else Popup shifts it up over the button.
         // Not y: the popup rewrites it when repositioning.
         height: {
-            var bounds = root.Overlay.overlay;
+            var bounds = root.T.Overlay.overlay;
             if (!bounds)
                 return Units.pt(320);
             var below = bounds.height - root.mapToItem(bounds, 0, root.height).y;

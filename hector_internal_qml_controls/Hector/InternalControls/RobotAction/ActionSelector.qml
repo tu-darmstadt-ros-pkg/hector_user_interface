@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.InternalControls 1.0
 import Hector.Controls 1.0
@@ -87,19 +87,20 @@ Item {
                 function moveActionOnList(i, direction) {
                     if (i == null)
                         return;
+                    // Copies: Qt 6 emits no change signal when re-assigning the same array
                     switch (direction) {
                     case 'up':
                         if (i > 0) {
                             var aux = selectedActions.splice(i, 1);
                             selectedActions.splice(i - 1, 0, aux[0]);
-                            selectedActions = selectedActions;
+                            selectedActions = [...selectedActions];
                         }
                         break;
                     case 'down':
                         if (i < selectedActions.length - 1) {
                             var aux = selectedActions.splice(i, 1);
                             selectedActions.splice(i + 1, 0, aux[0]);
-                            selectedActions = selectedActions;
+                            selectedActions = [...selectedActions];
                         }
                     }
                 }
@@ -150,7 +151,7 @@ Item {
                             onClicked: {
                                 if (editableText.visible) {
                                     selectedActions[index].name = editableText.text;
-                                    selectedActions = selectedActions;
+                                    selectedActions = [...selectedActions];
                                 }
                                 editableText.visible = !editableText.visible;
                                 fixedText.visible = !fixedText.visible;

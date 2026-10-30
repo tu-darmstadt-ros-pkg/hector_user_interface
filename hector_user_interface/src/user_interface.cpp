@@ -4,14 +4,14 @@
 
 #include "hector_user_interface/user_interface.h"
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <ament_index_cpp/get_package_share_path.hpp>
 
 namespace hector_user_interface
 {
 QString UserInterface::getPathToQml()
 {
-  std::string path = ament_index_cpp::get_package_share_directory( "hector_user_interface" );
-  return QString::fromStdString( path ) + "/ui/main.qml";
+  const auto path = ament_index_cpp::get_package_share_path( "hector_user_interface" ) / "ui/main.qml";
+  return QString::fromStdString( path.string() );
 }
 } // namespace hector_user_interface
 

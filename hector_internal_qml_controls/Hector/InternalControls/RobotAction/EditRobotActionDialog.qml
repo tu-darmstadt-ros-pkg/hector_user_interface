@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
+import QtQuick.Templates as T
 import QtQuick.Layouts 1.1
 import Hector.InternalControls 1.0
 import Hector.Controls 1.0
@@ -59,7 +60,7 @@ Dialog {
         paramsEditor.params = item && item.params || "";
         open();
     }
-    function reset() {
+    function resetFields() {
         nameTextField.text = "";
         iconButton.text = "Select icon";
         paramsEditor.params = "";
@@ -75,7 +76,7 @@ Dialog {
     closePolicy: Popup.NoAutoClose
     focus: true
     height: Units.pt(480)
-    parent: ApplicationWindow.overlay
+    parent: T.Overlay.overlay
     standardButtons: Dialog.Ok | Dialog.Cancel
     title: "Add Robot Control Action"
     width: Units.pt(480)
@@ -112,11 +113,11 @@ Dialog {
                 "subactions": actionSelector.selectedActions,
                 "parallel": parallelCheckbox.checked
             });
-        reset();
+        resetFields();
     }
     onRejected: {
         root.editFinished(false);
-        reset();
+        resetFields();
     }
 
     SelectIconDialog {

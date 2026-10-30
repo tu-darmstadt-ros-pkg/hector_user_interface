@@ -5,7 +5,7 @@ import Ros2 1.0
 //! Live value of a single announced sensor: subscribes to the sensor's topic and its optional warn
 //! topic and exposes the formatted value together with its stale, warn and danger state.
 //! Non-visual, the presentation is left to the user of this item.
-Object {
+NonVisualItem {
     id: control
 
     readonly property bool dangerous: crossesThreshold("danger_above", "danger_below")

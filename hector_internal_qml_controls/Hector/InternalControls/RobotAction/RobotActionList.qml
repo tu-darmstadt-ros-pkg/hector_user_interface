@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.Actions 1.0
 import Hector.InternalControls 1.0

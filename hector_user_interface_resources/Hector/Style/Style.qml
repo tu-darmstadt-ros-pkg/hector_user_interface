@@ -4,7 +4,7 @@ import QtQuick.Controls.Material 2.2
 import Hector.Icons 1.0
 import Hector.Utils 1.0
 
-Object {
+NonVisualItem {
     id: root
 
     readonly property QtObject activeStyle: d.activeStyle

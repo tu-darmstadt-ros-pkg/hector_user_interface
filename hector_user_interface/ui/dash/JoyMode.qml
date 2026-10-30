@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
+import QtQuick.Templates as T
 import QtQuick.Layouts 1.1
 import Hector.Controls 1.0
 import Hector.MultiRobot 1.0
@@ -72,7 +73,7 @@ Rectangle {
         focus: true
         height: parent.height * 0.8
         modal: true
-        parent: ApplicationWindow.overlay
+        parent: T.Overlay.overlay
         width: parent.width * 0.8
         x: (parent.width - width) / 2
         y: (parent.height - height) / 3

@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.1
+import QtQuick.Controls.Basic 2.1
+import QtQuick.Templates as T
 import Ros2 1.0
 import Hector.Controls 1.0
 import Hector.InternalControls 1.0
@@ -58,7 +59,7 @@ Button {
         id: recorderStatusSubscriber
         topic: RobotManager.activeRobot.namespace + "/onboard_logging_status"
 
-        onNewMessage: {
+        onNewMessage: function (message) {
             robotRecorderStatus.lastMsgMs = Date.now();
             robotRecorderStatus.statusSeq += 1;
             robotRecorderStatus.recorderState = message.state;
@@ -79,7 +80,7 @@ Button {
         id: recorderPopup
         focus: true
         height: Math.min(parent.height * 0.35, Units.pt(320))
-        parent: ApplicationWindow.overlay
+        parent: T.Overlay.overlay
         statusMsg: recorderStatusSubscriber.message
         statusSeq: robotRecorderStatus.statusSeq
         title: "Onboard Logging"

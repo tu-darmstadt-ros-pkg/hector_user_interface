@@ -1,7 +1,7 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
-import QtMultimedia 5.15
+import QtMultimedia
 import Ros2.CameraServer 1.0
 import Hector.Actions 1.0
 import Hector.Controls 1.0
@@ -72,7 +72,6 @@ Rectangle {
                 id: videoOutput
                 anchors.fill: parent
                 fillMode: VideoOutput.PreserveAspectCrop
-                source: cameraStream
             }
             CameraStream {
                 id: cameraStream
@@ -80,6 +79,7 @@ Rectangle {
                 enabled: root.matchedCamera !== null
                 preferredSize: Qt.size(videoOutput.width, videoOutput.height)
                 robot: root.robotId
+                videoSink: videoOutput.videoSink
             }
 
             // Placeholder when no camera is (yet) available for this robot.

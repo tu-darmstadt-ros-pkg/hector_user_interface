@@ -11,10 +11,10 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>qml-module-qtquick2</exec_depend>
-  <exec_depend>qml-module-qtquick-controls2</exec_depend>
-  <exec_depend>qml-module-qtquick-layouts</exec_depend>
-  <exec_depend>qml_ros2_plugin</exec_depend>
+  <exec_depend>qml6-module-qtquick</exec_depend>
+  <exec_depend>qml6-module-qtquick-controls</exec_depend>
+  <exec_depend>qml6-module-qtquick-layouts</exec_depend>
+  <exec_depend>qml6_ros2_plugin</exec_depend>
   <exec_depend>hector_qml_controls</exec_depend>
   <exec_depend>hector_user_interface_resources</exec_depend>
 

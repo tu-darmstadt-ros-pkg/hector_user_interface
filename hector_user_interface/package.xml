@@ -17,22 +17,23 @@
   <depend>moveit_ros_visualization</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>resource_retriever</depend>
   <depend>urdf</depend>
   <depend>sensor_msgs</depend>
   <depend>rviz2</depend>
   <depend>rviz_common</depend>
   <depend>rviz_default_plugins</depend>
   <depend>rviz_rendering</depend>
-  <exec_depend>ros_camera_server_qml</exec_depend>
+  <exec_depend>ros_camera_server_qml6</exec_depend>
   <exec_depend>hector_internal_qml_controls</exec_depend>
   <exec_depend>hector_qml_controls</exec_depend>
   <exec_depend>hector_user_interface_resources</exec_depend>
-  <exec_depend>libqt5-qml</exec_depend>
-  <exec_depend>qml-module-qtmultimedia</exec_depend>
-  <exec_depend>qml-module-qtquick-controls2</exec_depend>
-  <exec_depend>qml-module-qtquick-layouts</exec_depend>
-  <exec_depend>qml-module-qtquick2</exec_depend>
-  <exec_depend>qml_ros2_plugin</exec_depend>
+  <exec_depend>libqt6-qml</exec_depend>
+  <exec_depend>qml6-module-qtmultimedia</exec_depend>
+  <exec_depend>qml6-module-qtquick-controls</exec_depend>
+  <exec_depend>qml6-module-qtquick-layouts</exec_depend>
+  <exec_depend>qml6-module-qtquick</exec_depend>
+  <exec_depend>qml6_ros2_plugin</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
 

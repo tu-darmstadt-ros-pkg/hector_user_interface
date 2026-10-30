@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
+import QtQuick.Templates as T
 import QtQuick.Layouts 1.1
 import Hector.Controls 1.0
 import Hector.Utils 1.0
@@ -11,12 +12,12 @@ Dialog {
     signal selectionFinished(var items)
 
     function edit(parameters) {
-        reset();
+        resetFields();
         d.selectedParams = parameters;
         d.loadParameters();
         open();
     }
-    function reset() {
+    function resetFields() {
         filterTextField.text = "";
         paramsListView.visible = true;
         filterTextField.visible = true;
@@ -29,7 +30,7 @@ Dialog {
     focus: true
     height: Units.pt(400)
     modal: true
-    parent: ApplicationWindow.overlay
+    parent: T.Overlay.overlay
     standardButtons: Dialog.Ok | Dialog.Cancel
     title: "Add Parameters to Quick Settings"
     width: Units.pt(500)
@@ -49,9 +50,9 @@ Dialog {
         visible = false;
         d.selectedParams = d.parameters.filter(srv => srv.checked).map(srv => srv.data);
         root.selectionFinished(d.selectedParams);
-        reset();
+        resetFields();
     }
-    onRejected: reset()
+    onRejected: resetFields()
 
     ColumnLayout {
         anchors.fill: parent

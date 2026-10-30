@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.1
+import QtQuick.Controls.Basic 2.1
+import QtQuick.Templates as T
 import Ros2 1.0
 import Hector.Controls 1.0
 import Hector.InternalControls 1.0
@@ -41,7 +42,7 @@ Button {
         id: diagnosticPopup
         focus: true
         height: parent.height * 0.4
-        parent: ApplicationWindow.overlay
+        parent: T.Overlay.overlay
         title: "Diagnostic messages"
         width: parent.width * 0.9
         x: (parent.width - width) / 2

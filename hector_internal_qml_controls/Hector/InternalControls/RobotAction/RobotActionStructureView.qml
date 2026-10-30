@@ -1,5 +1,6 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
+import QtQuick.Templates as T
 import QtQuick.Layouts 1.1
 import Hector.InternalControls 1.0
 import Hector.InternalControls.RobotAction 1.0
@@ -42,7 +43,9 @@ Item {
         ColumnLayout {
             id: behaviorLayout
 
-            property var modelData: root.structure
+            //! Directory shown by this page, empty for the root. Looked up in the structure so edits show.
+            property string directoryUuid: ""
+            property var modelData: directoryUuid ? d.getStructureEntry(directoryUuid) : root.structure
 
             StackView.onRemoved: d.freeStackViewItems()
 
@@ -99,7 +102,7 @@ Item {
                 Layout.fillWidth: true
                 cellMinimumWidth: root.minimumCellWidth
                 keys: ["RobotAction"]
-                model: modelData.content || []
+                model: modelData && modelData.content || []
 
                 delegate: Component {
                     Item {
@@ -139,11 +142,11 @@ Item {
                             anchors.margins: Units.pt(4)
                             propagateComposedEvents: true
 
-                            onClicked: {
+                            onClicked: function (mouse) {
                                 if (mouse.button === Qt.RightButton)
                                     contextMenu.popup();
                             }
-                            onPressAndHold: {
+                            onPressAndHold: function (mouse) {
                                 if (mouse.source === Qt.MouseEventNotSynthesized)
                                     contextMenu.popup();
                             }
@@ -165,7 +168,7 @@ Item {
                                 anchors.fill: parent
                                 keys: ["RobotAction"]
 
-                                onDropped: {
+                                onDropped: function (drop) {
                                     enterDirectoryTimer.stop();
                                     if (drop.source == delegateRoot)
                                         return;
@@ -177,7 +180,7 @@ Item {
                                         d.moveItemToDirectory(delegateRoot.model, drop.source.model);
                                     }
                                 }
-                                onEntered: {
+                                onEntered: function (drag) {
                                     if (drag.source == delegateRoot)
                                         return;
                                     delegateRoot.highlighted = true;
@@ -190,7 +193,7 @@ Item {
                                     delegateRoot.highlighted = false;
                                     enterDirectoryTimer.stop();
                                 }
-                                onPositionChanged: {
+                                onPositionChanged: function (drag) {
                                     if (Math.abs(drag.x - lastX) < Units.pt(4) && Math.abs(drag.y - lastY) < Units.pt(4))
                                         return;
                                     lastX = drag.x;
@@ -296,7 +299,7 @@ Item {
                     }
                 }
 
-                onItemDropped: {
+                onItemDropped: function (drop, index) {
                     drop.accept();
                     if (!!drop.source.model) {
                         d.moveItemToDirectory(modelData, drop.source.model, index);
@@ -304,7 +307,7 @@ Item {
                         Ros2.error("Dropped RobotAction had no model set!");
                     }
                 }
-                onItemMoved: {
+                onItemMoved: function (from, to) {
                     d.handleItemMoved(modelData, from, to);
                 }
             }
@@ -323,7 +326,7 @@ Item {
 
         closePolicy: Popup.NoAutoClose
         focus: true
-        parent: ApplicationWindow.overlay
+        parent: T.Overlay.overlay
         standardButtons: Dialog.Ok | Dialog.Cancel
         title: "Rename directory"
         // Center dialog
@@ -393,9 +396,8 @@ Item {
             }
         }
         function _filterStructureContent(content) {
-            if (!Array.isArray(content))
-                return [];
-            return content.filter(Boolean);
+            // Array.from also accepts Qt sequences, which fail Array.isArray
+            return Array.from(content || []).filter(Boolean);
         }
         function _getStructureEntry(structure, uuid) {
             if (structure.uuid === uuid)
@@ -473,9 +475,14 @@ Item {
                 return;
             toRemove.push(item);
         }
-        function createDirectory(dropTarget, dropItem) {
-            root.structure = _createDirectory(root.structure, dropTarget, dropItem);
+        function commitStructure(structure) {
+            // Deep copy: Qt 6 emits no change signal when re-assigning the same object, and the
+            // pages of open subdirectories only refresh if their directory object is new as well.
+            root.structure = JSON.parse(JSON.stringify(structure));
             root.structureUpdated();
+        }
+        function createDirectory(dropTarget, dropItem) {
+            commitStructure(_createDirectory(root.structure, dropTarget, dropItem));
         }
         function drop(dragArea) {
             var item = dragArea.drag.target;
@@ -497,8 +504,7 @@ Item {
             return _getStructureEntry(root.structure, uuid);
         }
         function handleItemMoved(model, from, to) {
-            root.structure = _moveItemInStructure(root.structure, model, model.content[from], to);
-            root.structureUpdated();
+            commitStructure(_moveItemInStructure(root.structure, model, model.content[from], to));
         }
         function initActionStructure() {
             root.structure = {
@@ -515,16 +521,14 @@ Item {
                 initActionStructure();
                 var structure = root.structure;
                 structure.content.push(toStructureEntry(item));
-                root.structure = structure;
-                root.structureUpdated();
+                commitStructure(structure);
                 return;
             }
             if (isStructureEntry(item)) {
-                root.structure = _moveItemInStructure(root.structure, parent, item, index);
+                commitStructure(_moveItemInStructure(root.structure, parent, item, index));
             } else {
-                root.structure = _insertItemIntoStructure(root.structure, parent, toStructureEntry(item), index);
+                commitStructure(_insertItemIntoStructure(root.structure, parent, toStructureEntry(item), index));
             }
-            root.structureUpdated();
         }
         function openDirectory(model) {
             if (stackView.busy)
@@ -532,7 +536,7 @@ Item {
             var item = null;
             // Try reusing the item if possible during drag navigation
             for (var i = 0; i < toRemove.length; ++i) {
-                if (!toRemove[i].modelData || toRemove[i].modelData.uuid !== model.uuid)
+                if (toRemove[i].directoryUuid !== model.uuid)
                     continue;
                 item = toRemove[i];
                 toRemove.splice(i, 1);
@@ -540,17 +544,15 @@ Item {
             }
             if (!item)
                 item = behaviorView.createObject(stackView, {
-                        "modelData": model
+                        "directoryUuid": model.uuid
                     });
             stackView.push(item);
         }
         function removeStructureEntry(uuid) {
-            root.structure = _removeStructureEntry(root.structure, uuid);
-            root.structureUpdated();
+            commitStructure(_removeStructureEntry(root.structure, uuid));
         }
         function renameDirectory(uuid, newName) {
-            root.structure = _renameDirectory(root.structure, uuid, newName);
-            root.structureUpdated();
+            commitStructure(_renameDirectory(root.structure, uuid, newName));
         }
         function startDrag(dragArea) {
             var item = dragArea.drag.target;

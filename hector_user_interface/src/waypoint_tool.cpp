@@ -7,6 +7,7 @@
 
 #include <OgreEntity.h>
 #include <OgreSubMesh.h>
+#include <resource_retriever/retriever.hpp>
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/interaction/selection_manager.hpp>
 #include <rviz_common/interaction/view_picker.hpp>
@@ -21,7 +22,7 @@
 #include <rviz_rendering/mesh_loader.hpp>
 #include <rviz_rendering/viewport_projection_finder.hpp>
 
-#include <urdf/model.h>
+#include <urdf/model.hpp>
 
 #include <QVariant>
 #include <QVector3D>
@@ -76,15 +77,16 @@ void WaypointTool::onInitialize()
   InteractionTool::onInitialize();
   robot_description_topic_property_->initialize( context_->getRosNodeAbstraction() );
   joint_state_topic_property_->initialize( context_->getRosNodeAbstraction() );
+  resource_retriever::Retriever retriever;
   Ogre::MeshPtr preview_mesh =
-      rviz_rendering::loadMeshFromResource( Waypoint::WAYPOINT_PREVIEW_RESOURCE );
+      rviz_rendering::loadMeshFromResource( &retriever, Waypoint::WAYPOINT_PREVIEW_RESOURCE );
   if ( !preview_mesh ) {
     UI_LOG_ERROR( "Failed to load waypoint tool preview mesh." );
     return;
   }
   mesh_resources_.emplace( Waypoint::WAYPOINT_PREVIEW_RESOURCE, preview_mesh );
   Ogre::MeshPtr arrow_mesh =
-      rviz_rendering::loadMeshFromResource( Waypoint::WAYPOINT_ARROW_RESOURCE );
+      rviz_rendering::loadMeshFromResource( &retriever, Waypoint::WAYPOINT_ARROW_RESOURCE );
   if ( !arrow_mesh ) {
     UI_LOG_ERROR( "Failed to load waypoint tool orientation preview mesh." );
     return;

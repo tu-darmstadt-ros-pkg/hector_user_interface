@@ -8,7 +8,7 @@ import Hector.Utils 1.0
 //! reassignments. A newly discovered robot must not tear down and rebuild the
 //! displays of the robots already present, which an Instantiator would do since
 //! it recreates every delegate whenever its JS-array model is reassigned.
-Object {
+NonVisualItem {
     id: root
 
     // robot_id -> RobotVisualizationDisplays instance.

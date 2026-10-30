@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.Icons 1.0
 import Hector.MultiRobot 1.0
@@ -62,7 +62,7 @@ Item {
             acceptedButtons: Qt.AllButtons
             anchors.fill: parent
 
-            onWheel: wheel.accepted = true
+            onWheel: function (wheel) { wheel.accepted = true }
         }
         ListView {
             id: list
@@ -132,7 +132,7 @@ Item {
             hoverEnabled: true
 
             onClicked: root.collapsed = !root.collapsed
-            onWheel: wheel.accepted = true
+            onWheel: function (wheel) { wheel.accepted = true }
         }
     }
 }

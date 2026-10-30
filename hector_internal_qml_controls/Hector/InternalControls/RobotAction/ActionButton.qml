@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.1
+import QtQuick.Controls.Basic 2.1
 import Hector.InternalControls 1.0
 import Hector.MultiRobot 1.0
 import Hector.Style 1.0

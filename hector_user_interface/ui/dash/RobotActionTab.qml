@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.InternalControls 1.0
 import Hector.InternalControls.RobotAction 1.0
@@ -55,7 +55,7 @@ Rectangle {
             robot: root.robot
             structure: root.actionStructure
 
-            onEditActionRequested: {
+            onEditActionRequested: function (uuid) {
                 addActionDialog.edit(d.getAction(uuid));
             }
             onStructureUpdated: {
@@ -179,10 +179,10 @@ Rectangle {
                     model: root.actions
                     robot: root.robot
 
-                    onEditActionRequested: {
+                    onEditActionRequested: function (uuid) {
                         addActionDialog.edit(d.getAction(uuid));
                     }
-                    onRemoveActionRequested: {
+                    onRemoveActionRequested: function (uuid) {
                         // TODO Ask sure
                         d.removeAction(uuid);
                     }
@@ -205,7 +205,8 @@ Rectangle {
                     editItem = null;
                     return;
                 }
-                var actions = root.actions;
+                // Copy, Qt 6 ignores re-assigning the same array
+                var actions = Array.from(root.actions);
                 if (editItem) {
                     for (let prop in action)
                         editItem[prop] = action[prop];
@@ -242,7 +243,8 @@ Rectangle {
             }
         }
         function removeAction(uuid) {
-            var actions = root.actions;
+            // Copy, Qt 6 ignores re-assigning the same array
+            var actions = Array.from(root.actions);
             for (var i = 0; i < actions.length; ++i) {
                 if (actions[i].uuid !== uuid)
                     continue;
@@ -250,7 +252,8 @@ Rectangle {
                 break;
             }
             root.actions = actions;
-            root.actionStructure = removeActionFromStructure(root.actionStructure, uuid);
+            // Deep copy, see RobotActionStructureView.commitStructure
+            root.actionStructure = JSON.parse(JSON.stringify(removeActionFromStructure(root.actionStructure, uuid)));
             structureView.structure = root.actionStructure;
             root.actionsUpdated();
             root.actionStructureUpdated();

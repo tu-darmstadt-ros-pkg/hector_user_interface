@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls.Basic 2.2
 import QtQuick.Layouts 1.1
 import Hector.InternalControls 1.0
 import Hector.Controls 1.0
@@ -47,7 +47,7 @@ Dialog {
             Text {
                 text: 'For codes <a href="https://cdn.materialdesignicons.com/5.1.45/">check here</a>'
 
-                onLinkActivated: Qt.openUrlExternally(link)
+                onLinkActivated: function (link) { Qt.openUrlExternally(link) }
             }
         }
         ListView {

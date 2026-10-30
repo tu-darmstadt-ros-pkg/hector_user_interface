@@ -20,8 +20,8 @@ Rectangle {
         if (!configuration || !robot)
             return [];
         // Legacy configs stored cameraLayouts as one global array; reset it to the per-robot
-        // map, intentionally dropping the old global layouts.
-        if (!configuration.cameraLayouts || Array.isArray(configuration.cameraLayouts))
+        // map, intentionally dropping the old global layouts. Checks length since Qt sequences fail Array.isArray.
+        if (!configuration.cameraLayouts || typeof configuration.cameraLayouts.length === "number")
             configuration.cameraLayouts = {};
         if (!configuration.cameraLayouts[robot.robot_id])
             configuration.cameraLayouts[robot.robot_id] = [];
@@ -48,7 +48,7 @@ Rectangle {
     function storeCameraLayoutsConfig(robot, layouts) {
         if (!configuration || !robot)
             return;
-        if (!configuration.cameraLayouts || Array.isArray(configuration.cameraLayouts))
+        if (!configuration.cameraLayouts || typeof configuration.cameraLayouts.length === "number")
             configuration.cameraLayouts = {};
         configuration.cameraLayouts[robot.robot_id] = layouts;
     }
@@ -77,7 +77,7 @@ Rectangle {
         acceptedButtons: Qt.AllButtons
         anchors.fill: parent
 
-        onWheel: wheel.accepted = true
+        onWheel: function (wheel) { wheel.accepted = true }
     }
     ResizeHandle {
         anchors.left: parent.left
