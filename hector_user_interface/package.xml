@@ -40,6 +40,7 @@
   <!-- Messages required by UI -->
   <exec_depend>hector_user_interface_msgs</exec_depend>
   <exec_depend>hector_gamepad_manager_msgs</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
