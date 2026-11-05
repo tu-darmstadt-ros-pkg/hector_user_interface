@@ -11,6 +11,9 @@ import "dash"
 Rectangle {
     id: root
 
+    property var cameraMarkersProperty: rviz && rviz.registerBoolProperty("Camera Markers", true, "Render the rviz markers on top of the camera images.")
+    // Bumped on edits since changes inside configuration do not notify bindings.
+    property int cameraOverlayRevision: 0
     property var configuration
     property var style
 
@@ -26,6 +29,12 @@ Rectangle {
         if (!configuration.cameraLayouts[robot.robot_id])
             configuration.cameraLayouts[robot.robot_id] = [];
         return configuration.cameraLayouts[robot.robot_id];
+    }
+    // The displays shown on top of a camera, keyed by robot and camera id. Undefined if not set.
+    function cameraOverlayDisplays(robotId, cameraId) {
+        cameraOverlayRevision;
+        let overlays = configuration && configuration.cameraOverlays;
+        return overlays && overlays[robotId] ? overlays[robotId][cameraId] : undefined;
     }
 
     // Camera views and layouts are stored per robot (keyed by robot_id) in the shared
@@ -51,6 +60,17 @@ Rectangle {
         if (!configuration.cameraLayouts || typeof configuration.cameraLayouts.length === "number")
             configuration.cameraLayouts = {};
         configuration.cameraLayouts[robot.robot_id] = layouts;
+    }
+    function storeCameraOverlayDisplays(robotId, cameraId, displays) {
+        if (!configuration)
+            return;
+        if (!configuration.cameraOverlays)
+            configuration.cameraOverlays = {};
+        if (!configuration.cameraOverlays[robotId])
+            configuration.cameraOverlays[robotId] = {};
+        configuration.cameraOverlays[robotId][cameraId] = displays;
+        cameraOverlayRevision++;
+        root.configurationUpdated();
     }
     function storeCameraViewConfig(robot, cameraView) {
         if (!configuration || !robot)
@@ -78,6 +98,17 @@ Rectangle {
         anchors.fill: parent
 
         onWheel: function (wheel) { wheel.accepted = true }
+    }
+    Component {
+        id: cameraMarkerOverlay
+
+        CameraMarkerOverlay {
+            selectedDisplays: stream ? root.cameraOverlayDisplays(stream.robot, stream.cameraId) : undefined
+
+            onSelectionEdited: function (displays) {
+                root.storeCameraOverlayDisplays(stream.robot, stream.cameraId, displays);
+            }
+        }
     }
     ResizeHandle {
         anchors.left: parent.left
@@ -223,6 +254,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
+            cameraOverlay: root.cameraMarkersProperty && root.cameraMarkersProperty.value ? cameraMarkerOverlay : null
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {
@@ -237,6 +269,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
+            cameraOverlay: root.cameraMarkersProperty && root.cameraMarkersProperty.value ? cameraMarkerOverlay : null
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {
