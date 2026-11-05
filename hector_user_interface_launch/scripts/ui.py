@@ -229,4 +229,8 @@ if __name__ == "__main__":
         print_info(f"Launching Hector UI in namespace: {namespace}")
     else:
         print_info("Launching Hector UI (global; discovers all announced robots)")
+
+    # Ignore the desktop's color scheme unless a platform theme was explicitly requested, 
+    # as we don't have a proper dark theme yet.
+    os.environ.setdefault("QT_QPA_PLATFORMTHEME", "generic")
     launch_ui(launch_args)

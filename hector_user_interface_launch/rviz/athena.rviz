@@ -517,29 +517,6 @@ Visualization Manager:
       Enabled: true
       Name: Navigation
     - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Class: map_bag_rviz_plugin/MapBag
-      Color: 255; 255; 255
-      Color Gradient: Turbo
-      Color Layer: elevation
-      Color Transformer: Intensity
-      Enabled: true
-      Grid Color: 0; 0; 0
-      Height Layer: elevation
-      Height Transformer: Layer
-      Map Plane Alpha: 0.25
-      Map Plane Color: 255; 0; 0
-      Map Plane Grid Cell Size: 1
-      Max Intensity: 3
-      Mesh Mode: Mesh
-      Min Intensity: -1
-      Name: MapBag
-      Show Grid Lines: true
-      Show Map Planes: false
-      Tile Connections: Full
-      Topic: map_bag
-      Value: true
-    - Alpha: 1
       Axes Length: 0.10000000149011612
       Axes Radius: 0.009999999776482582
       Class: rviz_default_plugins/Pose
@@ -1100,7 +1077,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Filter:
         Axes Frame: <Fixed Frame>
         Channel: ""
@@ -1138,11 +1115,11 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: back_lidar/self_filter/filtered/colored
+        Value: back_lidar/self_filter/points
       Transport: raw
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -1155,7 +1132,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Filter:
         Axes Frame: <Fixed Frame>
         Channel: ""
@@ -1193,11 +1170,11 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: front_lidar/self_filter/filtered/colored
+        Value: front_lidar/self_filter/points
       Transport: raw
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz_common/Group
       Displays:
         - Alpha: 1

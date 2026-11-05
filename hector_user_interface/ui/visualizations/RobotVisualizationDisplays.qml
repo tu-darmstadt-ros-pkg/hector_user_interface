@@ -36,6 +36,12 @@ NonVisualItem {
         function applyConfiguration(display, viz, topics) {
             // Topic first, some displays create type-dependent sub-properties only after the topic is set
             applyTopic(display, viz, VisualizationTypes.displayTopic(viz, root.robot, rviz.namespace, topics));
+            let tfProperties = VisualizationTypes.tfPropertiesFor(viz, root.robot, rviz.namespace);
+            for (let key in tfProperties) {
+                if (!display.setPropertyValue(key, tfProperties[key]))
+                    Ros2.warn("Failed to set property '" + key + "' on display for visualization '" + viz.name + "'");
+            }
+            // Hints last, so a robot can still override the values above
             for (let key in viz.hints) {
                 if (!key.startsWith("rviz."))
                     continue;
@@ -45,8 +51,9 @@ NonVisualItem {
             }
         }
         function applyTopic(display, viz, topic) {
-            if (VisualizationTypes.usesTopicProperty(viz))
-                display.setPropertyValue("Topic", topic);
+            let topicProperty = VisualizationTypes.topicPropertyFor(viz);
+            if (topicProperty)
+                display.setPropertyValue(topicProperty, topic);
             else
                 display.setTopic(topic, viz.messageType);
             d.appliedTopicByName[viz.name] = topic;
