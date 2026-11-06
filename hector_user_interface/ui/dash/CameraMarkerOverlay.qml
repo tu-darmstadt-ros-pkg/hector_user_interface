@@ -93,6 +93,8 @@ CameraOverlay {
         readonly property real scaleX: control.imageSize.width > 0 ? control.width / control.imageSize.width : 0
         readonly property real scaleY: control.imageSize.height > 0 ? control.height / control.imageSize.height : 0
         property int topicRevision: 0
+        //! The rotation of the camera view this overlay is drawn in, see CameraViewImpl.
+        readonly property real viewRotation: control.parent ? control.parent.rotation : 0
     }
     Subscription {
         id: cameraInfoSubscription
@@ -165,15 +167,25 @@ CameraOverlay {
                         x: detectionItem.box.left * d.scaleX
                         y: detectionItem.box.top * d.scaleY
                     }
-                    Pill {
-                        color: boxRectangle.border.color
-                        font: Style.fonts.tiny
-                        horizontalPadding: Units.pt(4)
-                        text: detectionItem.detection.label + " " + Math.round(detectionItem.detection.score * 100) + "%"
-                        textColor: Style.getTextColor(color)
-                        verticalPadding: Units.pt(1)
-                        x: boxRectangle.x
-                        y: Math.max(0, boxRectangle.y - height)
+                    // The box as seen on screen, labeled on its top edge or inside if there is no space above.
+                    Item {
+                        readonly property bool sideways: d.viewRotation % 180 !== 0
+                        readonly property real spaceAbove: [boxRectangle.y, boxRectangle.x, control.height - boxRectangle.y - boxRectangle.height, control.width - boxRectangle.x - boxRectangle.width][(d.viewRotation / 90 % 4 + 4) % 4]
+
+                        anchors.centerIn: boxRectangle
+                        height: sideways ? boxRectangle.width : boxRectangle.height
+                        rotation: -d.viewRotation
+                        width: sideways ? boxRectangle.height : boxRectangle.width
+
+                        Pill {
+                            color: boxRectangle.border.color
+                            font: Style.fonts.tiny
+                            horizontalPadding: Units.pt(4)
+                            text: detectionItem.detection.label + " " + Math.round(detectionItem.detection.score * 100) + "%"
+                            textColor: Style.getTextColor(color)
+                            verticalPadding: Units.pt(1)
+                            y: parent.spaceAbove >= height ? -height : 0
+                        }
                     }
                 }
             }
