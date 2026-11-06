@@ -11,7 +11,7 @@ import "dash"
 Rectangle {
     id: root
 
-    property var cameraMarkersProperty: rviz && rviz.registerBoolProperty("Camera Markers", true, "Render the rviz markers on top of the camera images.")
+    property var cameraMarkersProperty: rviz && rviz.registerBoolProperty("Camera Markers", true, "Render the rviz markers and 2D detections on top of the camera images.")
     readonly property Component cameraOverlay: cameraMarkersProperty && cameraMarkersProperty.value ? cameraMarkerOverlay : null
     // Bumped on edits since changes inside configuration do not notify bindings.
     property int cameraOverlayRevision: 0

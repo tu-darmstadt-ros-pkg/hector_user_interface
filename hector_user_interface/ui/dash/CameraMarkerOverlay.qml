@@ -17,11 +17,8 @@ import Hector.Utils
 CameraOverlay {
     id: control
 
-    readonly property var availableDetectionTopics: {
-        settingsDialog.visible;
-        d.topicRevision;
-        return Ros2.queryTopics(d.detectionType).sort();
-    }
+    //! All detection topics, only reassigned on changes to not recreate the subscriptions.
+    property var availableDetectionTopics: []
     //! Selectable displays: { path, group, name, topic, classId, enabled }, ungrouped ones last.
     readonly property var availableDisplays: {
         settingsDialog.visible; // Topics do not notify changes, refresh when the dialog opens.
@@ -31,9 +28,9 @@ CameraOverlay {
         return grouped.concat(ungrouped);
     }
     readonly property var camera: stream ? Array.from(CameraServer.cameras).find(camera => camera.server.robot === stream.robot && camera.cameraId === stream.cameraId) || null : null
-    readonly property var detectionTopics: settings.detections !== undefined ? settings.detections : availableDetectionTopics
+    readonly property var detectionTopics: d.selection("detections", availableDetectionTopics.filter(topic => !stream || topic.startsWith("/" + stream.robot + "/")))
     readonly property var info: cameraInfoSubscription.message
-    //! The stored selection { displays, detections }. A missing entry selects all marker displays or detection topics.
+    //! The stored selection { displays, detections }. A missing entry selects all marker displays or the robot's detection topics.
     property var settings: ({})
     //! The CameraStream whose camera is used.
     property var stream: null
@@ -42,8 +39,11 @@ CameraOverlay {
     signal settingsEdited(var settings)
 
     function collectDisplays(displays, groups, enabled, grouped, ungrouped) {
+        let names = {};
         for (const display of displays) {
-            const path = groups.concat(display.name);
+            // Displays with the same name in one group are numbered from the second on.
+            names[display.name] = (names[display.name] || 0) + 1;
+            const path = groups.concat(names[display.name] > 1 ? display.name + "#" + names[display.name] : display.name);
             const displayEnabled = enabled && display.enabled;
             if (display.isGroup)
                 collectDisplays(display.displays, path, displayEnabled, grouped, ungrouped);
@@ -59,7 +59,13 @@ CameraOverlay {
         }
     }
     function openSettings() {
+        refreshDetectionTopics();
         settingsDialog.open();
+    }
+    function refreshDetectionTopics() {
+        const topics = Array.from(Ros2.queryTopics(d.detectionType)).sort();
+        if (JSON.stringify(topics) !== JSON.stringify(availableDetectionTopics))
+            availableDetectionTopics = topics;
     }
     function setSelected(key, value, selected) {
         let values = Array.from(key === "displays" ? control.displays : control.detectionTopics).filter(v => v !== value);
@@ -70,7 +76,7 @@ CameraOverlay {
         control.settingsEdited(settings);
     }
 
-    displays: settings.displays !== undefined ? settings.displays : availableDisplays.filter(display => d.markerClasses.includes(display.classId)).map(display => display.path)
+    displays: d.selection("displays", availableDisplays.filter(display => d.markerClasses.includes(display.classId)).map(display => display.path))
     frameId: info ? info.header.frame_id : ""
     imageSize: info ? Qt.size(info.width, info.height) : Qt.size(0, 0)
     intrinsics: info ? Qt.vector4d(info.k.at(0), info.k.at(4), info.k.at(2), info.k.at(5)) : Qt.vector4d(0, 0, 0, 0)
@@ -92,9 +98,14 @@ CameraOverlay {
         readonly property var overlayClasses: markerClasses.concat(["rviz_default_plugins/Path", "rviz_default_plugins/PointStamped", "rviz_default_plugins/Polygon", "rviz_default_plugins/Pose", "rviz_default_plugins/PoseArray"])
         readonly property real scaleX: control.imageSize.width > 0 ? control.width / control.imageSize.width : 0
         readonly property real scaleY: control.imageSize.height > 0 ? control.height / control.imageSize.height : 0
-        property int topicRevision: 0
         //! The rotation of the camera view this overlay is drawn in, see CameraViewImpl.
         readonly property real viewRotation: control.parent ? control.parent.rotation : 0
+
+        // A stored empty list is read back as null from the rviz config.
+        function selection(key, defaults) {
+            const value = control.settings[key];
+            return value === undefined ? defaults : Array.from(value || []);
+        }
     }
     Subscription {
         id: cameraInfoSubscription
@@ -107,9 +118,10 @@ CameraOverlay {
     Timer {
         interval: 5000
         repeat: true
-        running: control.visible && control.settings.detections === undefined
+        running: control.visible
+        triggeredOnStart: true
 
-        onTriggered: d.topicRevision++
+        onTriggered: control.refreshDetectionTopics()
     }
     Repeater {
         model: control.visible && control.frameId !== "" ? control.detectionTopics : []
@@ -117,16 +129,30 @@ CameraOverlay {
         delegate: Item {
             id: detectionsItem
 
+            // Without capture times of the shown image, detections are hidden if none were received for the timeout.
+            property bool fresh: false
             readonly property var message: detectionSubscription.message
 
             anchors.fill: parent
-            visible: !!message && message.header.frame_id === control.frameId && (!control.stamp || control.stamp - message.header.stamp.seconds() < d.detectionTimeout)
+            visible: !!message && message.header.frame_id === control.frameId && (control.stamp ? Math.abs(control.stamp - message.header.stamp.seconds()) < d.detectionTimeout : fresh)
+
+            onMessageChanged: {
+                fresh = true;
+                freshTimer.restart();
+            }
 
             Subscription {
                 id: detectionSubscription
 
                 messageType: d.detectionType
                 topic: modelData
+            }
+            Timer {
+                id: freshTimer
+
+                interval: d.detectionTimeout * 1000
+
+                onTriggered: detectionsItem.fresh = false
             }
             Repeater {
                 model: detectionsItem.visible ? detectionsItem.message.detections.length : 0
@@ -136,7 +162,7 @@ CameraOverlay {
 
                     readonly property var box: detection.bounding_box
                     readonly property var detection: detectionsItem.message.detections.at(index)
-                    readonly property real hue: (detection.id * 0.618) % 1
+                    readonly property real hue: ((detection.id * 0.618) % 1 + 1) % 1
 
                     Shape {
                         visible: detectionItem.detection.mask.points.length > 2
@@ -175,6 +201,7 @@ CameraOverlay {
                         anchors.centerIn: boxRectangle
                         height: sideways ? boxRectangle.width : boxRectangle.height
                         rotation: -d.viewRotation
+                        visible: boxRectangle.visible
                         width: sideways ? boxRectangle.height : boxRectangle.width
 
                         Pill {
@@ -277,18 +304,20 @@ CameraOverlay {
                     delegate: CameraOverlayListItem {
                         active: control.availableDetectionTopics.includes(modelData)
                         checked: control.detectionTopics.includes(modelData)
-                        inactiveToolTip: "No publisher on this topic."
+                        inactiveToolTip: "The topic does not exist (anymore)."
                         name: modelData
                         width: ListView.view.width
 
                         onToggled: control.setSelected("detections", modelData, !checked)
                     }
-
-                    Text {
-                        anchors.centerIn: parent
+                    footer: Text {
+                        height: ListView.view.count === 0 ? implicitHeight + Units.pt(8) : 0
+                        horizontalAlignment: Text.AlignHCenter
                         opacity: 0.6
                         text: "No detection topics found."
-                        visible: parent.count === 0
+                        verticalAlignment: Text.AlignVCenter
+                        visible: ListView.view.count === 0
+                        width: ListView.view.width
                     }
                 }
             }

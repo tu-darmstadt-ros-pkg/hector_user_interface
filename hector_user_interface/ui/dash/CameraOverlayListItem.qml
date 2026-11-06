@@ -30,6 +30,7 @@ Rectangle {
 
         CheckBox {
             checked: control.checked
+            focusPolicy: Qt.NoFocus
         }
         ColumnLayout {
             Layout.fillWidth: true
