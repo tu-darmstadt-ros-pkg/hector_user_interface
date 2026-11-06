@@ -31,11 +31,11 @@ Rectangle {
             configuration.cameraLayouts[robot.robot_id] = [];
         return configuration.cameraLayouts[robot.robot_id];
     }
-    // The displays shown on top of a camera, keyed by robot and camera id. Undefined if not set.
-    function cameraOverlayDisplays(robotId, cameraId) {
+    // The overlay settings of a camera, keyed by robot and camera id.
+    function cameraOverlaySettings(robotId, cameraId) {
         cameraOverlayRevision;
         let overlays = configuration && configuration.cameraOverlays;
-        return overlays && overlays[robotId] ? overlays[robotId][cameraId] : undefined;
+        return overlays && overlays[robotId] && overlays[robotId][cameraId] || {};
     }
 
     // Camera views and layouts are stored per robot (keyed by robot_id) in the shared
@@ -62,14 +62,14 @@ Rectangle {
             configuration.cameraLayouts = {};
         configuration.cameraLayouts[robot.robot_id] = layouts;
     }
-    function storeCameraOverlayDisplays(robotId, cameraId, displays) {
+    function storeCameraOverlaySettings(robotId, cameraId, settings) {
         if (!configuration)
             return;
         if (!configuration.cameraOverlays)
             configuration.cameraOverlays = {};
         if (!configuration.cameraOverlays[robotId])
             configuration.cameraOverlays[robotId] = {};
-        configuration.cameraOverlays[robotId][cameraId] = displays;
+        configuration.cameraOverlays[robotId][cameraId] = settings;
         cameraOverlayRevision++;
         root.configurationUpdated();
     }
@@ -104,10 +104,10 @@ Rectangle {
         id: cameraMarkerOverlay
 
         CameraMarkerOverlay {
-            selectedDisplays: stream ? root.cameraOverlayDisplays(stream.robot, stream.cameraId) : undefined
+            settings: stream ? root.cameraOverlaySettings(stream.robot, stream.cameraId) : ({})
 
-            onSelectionEdited: function (displays) {
-                root.storeCameraOverlayDisplays(stream.robot, stream.cameraId, displays);
+            onSettingsEdited: function (settings) {
+                root.storeCameraOverlaySettings(stream.robot, stream.cameraId, settings);
             }
         }
     }
