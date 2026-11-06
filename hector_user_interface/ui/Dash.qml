@@ -100,10 +100,16 @@ Rectangle {
 
         onWheel: function (wheel) { wheel.accepted = true }
     }
+    DetectionSubscriptions {
+        id: detectionSubscriptions
+
+        active: root.cameraOverlay !== null
+    }
     Component {
         id: cameraMarkerOverlay
 
         CameraMarkerOverlay {
+            detections: detectionSubscriptions
             settings: stream ? root.cameraOverlaySettings(stream.robot, stream.cameraId) : ({})
 
             onSettingsEdited: function (settings) {

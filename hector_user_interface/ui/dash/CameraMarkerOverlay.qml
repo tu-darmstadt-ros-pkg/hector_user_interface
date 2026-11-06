@@ -17,8 +17,6 @@ import Hector.Utils
 CameraOverlay {
     id: control
 
-    //! All detection topics, only reassigned on changes to not recreate the subscriptions.
-    property var availableDetectionTopics: []
     //! Selectable displays: { path, group, name, topic, classId, enabled }, ungrouped ones last.
     readonly property var availableDisplays: {
         settingsDialog.visible; // Topics do not notify changes, refresh when the dialog opens.
@@ -28,7 +26,9 @@ CameraOverlay {
         return grouped.concat(ungrouped);
     }
     readonly property var camera: stream ? Array.from(CameraServer.cameras).find(camera => camera.server.robot === stream.robot && camera.cameraId === stream.cameraId) || null : null
-    readonly property var detectionTopics: d.selection("detections", availableDetectionTopics.filter(topic => !stream || topic.startsWith("/" + stream.robot + "/")))
+    readonly property var detectionTopics: d.selection("detections", detections ? detections.topics.filter(topic => !stream || topic.startsWith("/" + stream.robot + "/")) : [])
+    //! The shared DetectionSubscriptions.
+    property var detections: null
     readonly property var info: cameraInfoSubscription.message
     //! The stored selection { displays, detections }. A missing entry selects all marker displays or the robot's detection topics.
     property var settings: ({})
@@ -59,13 +59,9 @@ CameraOverlay {
         }
     }
     function openSettings() {
-        refreshDetectionTopics();
+        if (detections)
+            detections.refresh();
         settingsDialog.open();
-    }
-    function refreshDetectionTopics() {
-        const topics = Array.from(Ros2.queryTopics(d.detectionType)).sort();
-        if (JSON.stringify(topics) !== JSON.stringify(availableDetectionTopics))
-            availableDetectionTopics = topics;
     }
     function setSelected(key, value, selected) {
         let values = Array.from(key === "displays" ? control.displays : control.detectionTopics).filter(v => v !== value);
@@ -85,6 +81,7 @@ CameraOverlay {
     QtObject {
         id: d
 
+        readonly property var availableDetectionTopics: control.detections ? control.detections.topics : []
         readonly property string cameraInfoTopic: {
             if (control.camera && control.camera.cameraInfoTopic)
                 return control.camera.cameraInfoTopic;
@@ -93,7 +90,6 @@ CameraOverlay {
         }
         //! Detections older than this relative to the shown image are hidden.
         readonly property real detectionTimeout: 1
-        readonly property string detectionType: "hector_perception_msgs/msg/ObjectDetection2DArray"
         readonly property var markerClasses: ["rviz_default_plugins/Marker", "rviz_default_plugins/MarkerArray", "rviz_default_plugins/InteractiveMarkers"]
         readonly property var overlayClasses: markerClasses.concat(["rviz_default_plugins/Path", "rviz_default_plugins/PointStamped", "rviz_default_plugins/Polygon", "rviz_default_plugins/Pose", "rviz_default_plugins/PoseArray"])
         readonly property real scaleX: control.imageSize.width > 0 ? control.width / control.imageSize.width : 0
@@ -115,23 +111,16 @@ CameraOverlay {
         throttleRate: 1
         topic: d.cameraInfoTopic
     }
-    Timer {
-        interval: 5000
-        repeat: true
-        running: control.visible
-        triggeredOnStart: true
-
-        onTriggered: control.refreshDetectionTopics()
-    }
     Repeater {
-        model: control.visible && control.frameId !== "" ? control.detectionTopics : []
+        model: control.visible && control.frameId !== "" && control.detections ? control.detectionTopics : []
 
         delegate: Item {
             id: detectionsItem
 
             // Without capture times of the shown image, detections are hidden if none were received for the timeout.
             property bool fresh: false
-            readonly property var message: detectionSubscription.message
+            readonly property var message: subscription ? subscription.message : null
+            readonly property var subscription: control.detections.subscription(modelData)
 
             anchors.fill: parent
             visible: !!message && message.header.frame_id === control.frameId && (control.stamp ? Math.abs(control.stamp - message.header.stamp.seconds()) < d.detectionTimeout : fresh)
@@ -141,12 +130,6 @@ CameraOverlay {
                 freshTimer.restart();
             }
 
-            Subscription {
-                id: detectionSubscription
-
-                messageType: d.detectionType
-                topic: modelData
-            }
             Timer {
                 id: freshTimer
 
@@ -298,11 +281,11 @@ CameraOverlay {
                 ListView {
                     clip: true
                     implicitHeight: Math.min(Math.max(contentHeight, Units.pt(24)), Units.pt(240))
-                    model: Array.from(new Set(control.availableDetectionTopics.concat(control.detectionTopics)))
+                    model: Array.from(new Set(d.availableDetectionTopics.concat(control.detectionTopics)))
                     spacing: Units.pt(2)
 
                     delegate: CameraOverlayListItem {
-                        active: control.availableDetectionTopics.includes(modelData)
+                        active: d.availableDetectionTopics.includes(modelData)
                         checked: control.detectionTopics.includes(modelData)
                         inactiveToolTip: "The topic does not exist (anymore)."
                         name: modelData
