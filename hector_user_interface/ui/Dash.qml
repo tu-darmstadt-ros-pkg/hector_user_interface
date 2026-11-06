@@ -12,6 +12,7 @@ Rectangle {
     id: root
 
     property var cameraMarkersProperty: rviz && rviz.registerBoolProperty("Camera Markers", true, "Render the rviz markers on top of the camera images.")
+    readonly property Component cameraOverlay: cameraMarkersProperty && cameraMarkersProperty.value ? cameraMarkerOverlay : null
     // Bumped on edits since changes inside configuration do not notify bindings.
     property int cameraOverlayRevision: 0
     property var configuration
@@ -254,7 +255,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
-            cameraOverlay: root.cameraMarkersProperty && root.cameraMarkersProperty.value ? cameraMarkerOverlay : null
+            cameraOverlay: root.cameraOverlay
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {
@@ -269,7 +270,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
-            cameraOverlay: root.cameraMarkersProperty && root.cameraMarkersProperty.value ? cameraMarkerOverlay : null
+            cameraOverlay: root.cameraOverlay
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {
