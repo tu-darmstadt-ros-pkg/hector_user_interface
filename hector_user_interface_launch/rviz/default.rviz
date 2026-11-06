@@ -356,23 +356,23 @@ Visualization Manager:
                 value: ""
               - evaluateParams: false
                 icon: 󰣖
-                messageType: std_srvs/srv/SetBool
+                messageType: controller_manager_msgs/srv/SwitchController
                 name: Disable torque
                 parallel: false
-                params: "{\n  \"data\": false\n}"
+                params: "{\n  \"#messageType\": \"controller_manager_msgs/srv/SwitchController_Request\",\n  \"activate_asap\": false,\n  \"activate_controllers\": [\"arm_torque_off_controller\"],\n  \"deactivate_controllers\": [],\n  \"strictness\": 4,\n  \"timeout\": {\n    \"seconds\": 5,\n    \"nanoseconds\": 0\n  }\n}"
                 subactions: ""
-                topic: /athena/athena_arm_interface/set_torque
+                topic: /athena/controller_manager/switch_controller
                 type: service
                 uuid: 14cac6d9-d983-409b-9fce-9b8007b5f309
                 value: ""
               - evaluateParams: false
                 icon: 󰣖
-                messageType: std_srvs/srv/SetBool
+                messageType: controller_manager_msgs/srv/SwitchController
                 name: Enable torque
                 parallel: false
-                params: "{\n  \"data\": true\n}"
+                params: "{\n  \"#messageType\": \"controller_manager_msgs/srv/SwitchController_Request\",\n  \"activate_asap\": false,\n  \"activate_controllers\": [\"arm_trajectory_controller\", \"arm_safety_position_controller\"],\n  \"deactivate_controllers\": [\"arm_torque_off_controller\"],\n  \"strictness\": 3,\n  \"timeout\": {\n    \"seconds\": 5,\n    \"nanoseconds\": 0\n  }\n}"
                 subactions: ""
-                topic: /athena/athena_arm_interface/set_torque
+                topic: /athena/controller_manager/switch_controller
                 type: service
                 uuid: 7726bfbb-e099-43bf-97f4-ca932f7ecb5c
                 value: ""
