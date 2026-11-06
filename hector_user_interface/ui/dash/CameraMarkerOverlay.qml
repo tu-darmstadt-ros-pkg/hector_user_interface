@@ -6,7 +6,6 @@ import QtQuick.Templates as T
 import Ros2
 import Ros2.CameraServer
 import Hector.Controls
-import Hector.InternalControls
 import Hector.RvizOverlay
 import Hector.Style
 import Hector.Utils
@@ -199,13 +198,29 @@ CameraOverlay {
                 Layout.fillWidth: true
                 spacing: 0
 
-                StyledTabButton {
-                    style: Style.activeStyle
-                    text: "3D Markers"
-                }
-                StyledTabButton {
-                    style: Style.activeStyle
-                    text: "2D Detections"
+                Repeater {
+                    model: ["3D Markers", "2D Detections"]
+
+                    TabButton {
+                        id: tabButton
+
+                        font: Style.button.font
+                        hoverEnabled: true
+                        text: modelData
+
+                        background: Rectangle {
+                            color: Style.handleMouseStates(tabButton, Style.background.container, Style.buttonStyle(Style.activeStyle).color)
+                            implicitHeight: Style.button.defaultHeight
+                        }
+                        contentItem: Text {
+                            color: Style.getTextColor(tabButton.background.color)
+                            elide: Text.ElideRight
+                            font: tabButton.font
+                            horizontalAlignment: Text.AlignHCenter
+                            text: tabButton.text
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
                 }
             }
             StackLayout {
