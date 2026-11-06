@@ -10,7 +10,8 @@ import Hector.Style
 import Hector.Utils
 
 //! Renders the rviz markers from the perspective of the camera of the given CameraStream.
-//! The camera_info is expected next to the image topic of one of the camera's ros2 streams.
+//! The camera_info topic is taken from the camera announcement or, if not announced, expected next
+//! to the image topic of one of the camera's ros2 streams.
 CameraOverlay {
     id: control
 
@@ -63,11 +64,14 @@ CameraOverlay {
     frameId: info ? info.header.frame_id : ""
     imageSize: info ? Qt.size(info.width, info.height) : Qt.size(0, 0)
     intrinsics: info ? Qt.vector4d(info.k.at(0), info.k.at(4), info.k.at(2), info.k.at(5)) : Qt.vector4d(0, 0, 0, 0)
+    stamp: stream && stream.captureTime || 0
 
     QtObject {
         id: d
 
         readonly property string cameraInfoTopic: {
+            if (control.camera && control.camera.cameraInfoTopic)
+                return control.camera.cameraInfoTopic;
             const rosStream = control.camera && Array.from(control.camera.streams).find(cameraStream => cameraStream.transport === "ros2");
             return rosStream ? rosStream.uri.replace(/[^/]*$/, "camera_info") : "";
         }
