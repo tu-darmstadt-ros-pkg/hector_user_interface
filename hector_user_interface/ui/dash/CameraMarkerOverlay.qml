@@ -103,13 +103,24 @@ CameraOverlay {
             return value === undefined ? defaults : Array.from(value || []);
         }
     }
+    // The camera_info is only fetched once and refreshed periodically to save bandwidth.
     Subscription {
         id: cameraInfoSubscription
 
-        enabled: control.visible && topic !== ""
+        property bool requested: true
+
+        enabled: control.visible && requested && topic !== ""
         messageType: "sensor_msgs/msg/CameraInfo"
-        throttleRate: 1
         topic: d.cameraInfoTopic
+
+        onMessageChanged: requested = !message
+    }
+    Timer {
+        interval: 30000
+        repeat: true
+        running: control.visible
+
+        onTriggered: cameraInfoSubscription.requested = true
     }
     Repeater {
         model: control.visible && control.frameId !== "" && control.detections ? control.detectionTopics : []
@@ -120,11 +131,17 @@ CameraOverlay {
             // Without capture times of the shown image, detections are hidden if none were received for the timeout.
             property bool fresh: false
             readonly property var message: subscription ? subscription.message : null
-            readonly property var subscription: control.detections.subscription(modelData)
+            readonly property var subscription: control.detections.subscription(topic)
+            readonly property string topic: modelData
 
             anchors.fill: parent
             visible: !!message && message.header.frame_id === control.frameId && (control.stamp ? Math.abs(control.stamp - message.header.stamp.seconds()) < d.detectionTimeout : fresh)
 
+            Component.onCompleted: control.detections.acquire(topic)
+            Component.onDestruction: {
+                if (control.detections)
+                    control.detections.release(topic);
+            }
             onMessageChanged: {
                 fresh = true;
                 freshTimer.restart();
