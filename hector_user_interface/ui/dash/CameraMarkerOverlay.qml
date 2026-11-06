@@ -107,20 +107,32 @@ CameraOverlay {
     Subscription {
         id: cameraInfoSubscription
 
+        // Latched camera_infos, e.g., of image_projection, need a transient local subscription which
+        // does not match volatile publishers with DDS. Hence, the durability of the publishers is used.
+        property bool latched: {
+            revision;
+            return Ros2.getPublishersInfoByTopic(topic).some(info => info.qos.durability === DurabilityPolicy.TransientLocal);
+        }
         property bool requested: true
+        property int revision: 0
 
         enabled: control.visible && requested && topic !== ""
         messageType: "sensor_msgs/msg/CameraInfo"
+        qos: latched ? Ros2.QoS().transient_local().reliable() : Ros2.QoS()
         topic: d.cameraInfoTopic
 
         onMessageChanged: requested = !message
     }
+    // Checks the publishers again until a camera_info is received, as they may not be discovered yet.
     Timer {
-        interval: 30000
+        interval: cameraInfoSubscription.message ? 30000 : 1000
         repeat: true
         running: control.visible
 
-        onTriggered: cameraInfoSubscription.requested = true
+        onTriggered: {
+            cameraInfoSubscription.revision++;
+            cameraInfoSubscription.requested = true;
+        }
     }
     Repeater {
         model: control.visible && control.frameId !== "" && control.detections ? control.detectionTopics : []
@@ -209,7 +221,8 @@ CameraOverlay {
                             font: Style.fonts.tiny
                             horizontalPadding: Units.pt(4)
                             text: detectionItem.detection.label + " " + Math.round(detectionItem.detection.score * 100) + "%"
-                            textColor: Style.getTextColor(color)
+                            // By perceived brightness, the hsl lightness of all detection colors is the same.
+                            textColor: 0.299 * color.r + 0.587 * color.g + 0.114 * color.b > 0.55 ? "black" : "white"
                             verticalPadding: Units.pt(1)
                             y: parent.spaceAbove >= height ? -height : 0
                         }

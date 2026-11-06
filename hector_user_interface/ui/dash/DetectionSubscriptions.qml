@@ -28,7 +28,7 @@ NonVisualItem {
             root.topics = topics;
     }
     function release(topic) {
-        if (--d.users[topic] > 0)
+        if (!d.users[topic] || --d.users[topic] > 0)
             return;
         delete d.users[topic];
         d.subscriptions[topic].destroy();
