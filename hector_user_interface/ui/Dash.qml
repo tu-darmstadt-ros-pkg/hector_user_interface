@@ -11,6 +11,10 @@ import "dash"
 Rectangle {
     id: root
 
+    property var cameraMarkersProperty: rviz && rviz.registerBoolProperty("Camera Markers", true, "Render the rviz markers and 2D detections on top of the camera images.")
+    readonly property Component cameraOverlay: cameraMarkersProperty && cameraMarkersProperty.value ? cameraMarkerOverlay : null
+    // Bumped on edits since changes inside configuration do not notify bindings.
+    property int cameraOverlayRevision: 0
     property var configuration
     property var style
 
@@ -26,6 +30,12 @@ Rectangle {
         if (!configuration.cameraLayouts[robot.robot_id])
             configuration.cameraLayouts[robot.robot_id] = [];
         return configuration.cameraLayouts[robot.robot_id];
+    }
+    // The overlay settings of a camera, keyed by robot and camera id.
+    function cameraOverlaySettings(robotId, cameraId) {
+        cameraOverlayRevision;
+        let overlays = configuration && configuration.cameraOverlays;
+        return overlays && overlays[robotId] && overlays[robotId][cameraId] || {};
     }
 
     // Camera views and layouts are stored per robot (keyed by robot_id) in the shared
@@ -51,6 +61,17 @@ Rectangle {
         if (!configuration.cameraLayouts || typeof configuration.cameraLayouts.length === "number")
             configuration.cameraLayouts = {};
         configuration.cameraLayouts[robot.robot_id] = layouts;
+    }
+    function storeCameraOverlaySettings(robotId, cameraId, settings) {
+        if (!configuration)
+            return;
+        if (!configuration.cameraOverlays)
+            configuration.cameraOverlays = {};
+        if (!configuration.cameraOverlays[robotId])
+            configuration.cameraOverlays[robotId] = {};
+        configuration.cameraOverlays[robotId][cameraId] = settings;
+        cameraOverlayRevision++;
+        root.configurationUpdated();
     }
     function storeCameraViewConfig(robot, cameraView) {
         if (!configuration || !robot)
@@ -78,6 +99,23 @@ Rectangle {
         anchors.fill: parent
 
         onWheel: function (wheel) { wheel.accepted = true }
+    }
+    DetectionSubscriptions {
+        id: detectionSubscriptions
+
+        active: root.cameraOverlay !== null
+    }
+    Component {
+        id: cameraMarkerOverlay
+
+        CameraMarkerOverlay {
+            detections: detectionSubscriptions
+            settings: stream ? root.cameraOverlaySettings(stream.robot, stream.cameraId) : ({})
+
+            onSettingsEdited: function (settings) {
+                root.storeCameraOverlaySettings(stream.robot, stream.cameraId, settings);
+            }
+        }
     }
     ResizeHandle {
         anchors.left: parent.left
@@ -223,6 +261,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
+            cameraOverlay: root.cameraOverlay
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {
@@ -237,6 +276,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.minimumWidth: Units.pt(120)
             Layout.preferredWidth: 1
+            cameraOverlay: root.cameraOverlay
             configuration: root.cameraViewConfig(RobotManager.activeRobot)
 
             onConfigurationUpdated: {

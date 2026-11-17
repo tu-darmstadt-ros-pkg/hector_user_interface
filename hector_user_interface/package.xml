@@ -26,6 +26,7 @@
   <depend>rviz_rendering</depend>
   <exec_depend>ros_camera_server_qml6</exec_depend>
   <exec_depend>hector_internal_qml_controls</exec_depend>
+  <exec_depend>hector_perception_msgs</exec_depend>
   <exec_depend>hector_qml_controls</exec_depend>
   <exec_depend>hector_user_interface_resources</exec_depend>
   <exec_depend>libqt6-qml</exec_depend>
