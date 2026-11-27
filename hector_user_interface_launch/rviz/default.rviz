@@ -200,7 +200,6 @@ Visualization Manager:
             - Class: rviz_default_plugins/MarkerArray
               Enabled: false
               Name: Trajectory Samples
-              Namespaces: true
               Topic:
                 Depth: 5
                 Durability Policy: Volatile
@@ -357,23 +356,23 @@ Visualization Manager:
                 value: ""
               - evaluateParams: false
                 icon: 󰣖
-                messageType: std_srvs/srv/SetBool
+                messageType: controller_manager_msgs/srv/SwitchController
                 name: Disable torque
                 parallel: false
-                params: "{\n  \"data\": false\n}"
+                params: "{\n  \"#messageType\": \"controller_manager_msgs/srv/SwitchController_Request\",\n  \"activate_asap\": false,\n  \"activate_controllers\": [\"arm_torque_off_controller\"],\n  \"deactivate_controllers\": [],\n  \"strictness\": 4,\n  \"timeout\": {\n    \"seconds\": 5,\n    \"nanoseconds\": 0\n  }\n}"
                 subactions: ""
-                topic: /athena/athena_arm_interface/set_torque
+                topic: /athena/controller_manager/switch_controller
                 type: service
                 uuid: 14cac6d9-d983-409b-9fce-9b8007b5f309
                 value: ""
               - evaluateParams: false
                 icon: 󰣖
-                messageType: std_srvs/srv/SetBool
+                messageType: controller_manager_msgs/srv/SwitchController
                 name: Enable torque
                 parallel: false
-                params: "{\n  \"data\": true\n}"
+                params: "{\n  \"#messageType\": \"controller_manager_msgs/srv/SwitchController_Request\",\n  \"activate_asap\": false,\n  \"activate_controllers\": [\"arm_trajectory_controller\", \"arm_safety_position_controller\"],\n  \"deactivate_controllers\": [\"arm_torque_off_controller\"],\n  \"strictness\": 3,\n  \"timeout\": {\n    \"seconds\": 5,\n    \"nanoseconds\": 0\n  }\n}"
                 subactions: ""
-                topic: /athena/athena_arm_interface/set_torque
+                topic: /athena/controller_manager/switch_controller
                 type: service
                 uuid: 7726bfbb-e099-43bf-97f4-ca932f7ecb5c
                 value: ""
@@ -395,264 +394,7 @@ Visualization Manager:
       Scale: 1
       Value: true
       Z-Index: 0
-    - /athena:
-        Alpha: 1
-        Class: ""
-        Collision Enabled: false
-        Description File: ""
-        Description Source: Topic
-        Description Topic:
-          Depth: 5
-          Durability Policy: Volatile
-          History Policy: Keep Last
-          Reliability Policy: Reliable
-          Value: /athena/robot_description
-        Enabled: true
-        Links:
-          All Links Enabled: true
-          Expand Joint Details: false
-          Expand Link Details: false
-          Expand Tree: false
-          Link Tree Style: Links in Alphabetic Order
-          arm_base_thermal_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_base_thermal_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          arm_end_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          arm_link_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          back_lidar_laser_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          back_lidar_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          back_rgbd_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          back_sensor_mount_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          back_wideangle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          back_wideangle_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          base_footprint_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          chassis_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          flipper_bl_calibration_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          flipper_bl_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          flipper_br_calibration_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          flipper_br_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          flipper_fl_calibration_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          flipper_fl_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          flipper_fr_calibration_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          flipper_fr_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          front_lidar_laser_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          front_lidar_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          front_rgbd_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          front_sensor_mount_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          front_wideangle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          front_wideangle_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          ft_sensor_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_grasp_main_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_grasp_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_joint_link_l2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_joint_link_r2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_link_l1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_l2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_r1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_link_r2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_rgb_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_rgb_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_rgbd_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_servo_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_thermal_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_thermal_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          main_track_left_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          main_track_right_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-        Mass Properties:
-          Inertia: false
-          Mass: false
-        Name: /athena
-        TF Prefix: athena
-        Update Interval: 0
-        Value: true
-        Visual Enabled: true
-      Class: hector_rviz_plugins/MultiRobotModel
+    - Class: hector_rviz_plugins/MultiRobotModel
       Enable Scan: true
       Enabled: true
       Name: MultiRobotModel
